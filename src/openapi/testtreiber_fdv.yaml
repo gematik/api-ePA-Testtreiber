@@ -319,9 +319,9 @@ paths:
               'permissionAccessCategory wird übergeschrieben, die LEI bekommt auf keine Kategorie ein Leserecht, evtl bereits erteilte feingranulare Berechtigungen bleiben erhalten. Entsprechend ist das Policy Dokument zu erstellen.':
                 value:
                   account:
-                    account: K1234567890
-                    insurantId: K1234567890
-                    pkcs12: PKCS12
+                    account: K123456789
+                    insurantId: K123456789
+                    pkcs12: ''
                     passwordPrivateKey: PASSWORD
                     passwordKeyStore: PASSWORD
                   hcpoTelematikId: 1-SMC-B-Testkarte-883110000092397
@@ -331,9 +331,9 @@ paths:
               'permissionAccessCategory wird übergeschrieben, die LEI bekommt ausschließlich auf Kategorie "eab" level "N" ein Leserecht, evtl bereits erteilte feingranulare Berechtigungen bleiben erhalten. Entsprechend ist das Policy Dokument zu erstellen.':
                 value:
                   account:
-                    account: K1234567890
-                    insurantId: K1234567890
-                    pkcs12: PKCS12
+                    account: K123456789
+                    insurantId: K123456789
+                    pkcs12: ''
                     passwordPrivateKey: PASSWORD
                     passwordKeyStore: PASSWORD
                   hcpoTelematikId: 1-SMC-B-Testkarte-883110000092397
@@ -678,9 +678,9 @@ paths:
               examples:
                 Beispiel Antwort:
                   value:
-                    success: 'true'
+                    success: true
                     statusMessage: Operation Completed
-                    documentSet:
+                    documents:
                       - content: PEJ1bmRsZSB4bWxucz0iaHR0cDovL2hsNy5vcmcvZmhpciI+CiAgICA8aWQgdmFsdWU9IjAwMTU3OGY4LTBiNzYtNDE5Ny1hZmQ5LWQ4MzIyNzUxNmU0NiIgLz4KICAgIDxtZXRhPgogICAgICAgIDxsYXN0VXBkYXRlZCB2YWx1ZT0iMjAxOS0xMi0yNFQxMjozMDowMloiIC8+CiAgICAgICAgPHByb2ZpbGUgdmFsdWU9Imh0dHBzOi8vZmhpci5rYnYuZGUvU3RydWN0dXJlRGVmaW5pdGlvbi9LQlZfUFJfTUlPX1ZhY2NpbmF0aW9uX0J1bmRsZV9FbnRyeXwxLjEuMCIgLz4KICAgIDwvbWV0YT4KPC9CdW5kbGU+
                         formatCode: 'urn:gematik:ig:Impfausweis:v1.1.0'
       description: Operation für die Prüfung der pseudonymisierung der Dokumente
@@ -1897,7 +1897,7 @@ components:
           enum:
             - true
             - false
-          example: 'true'
+          example: true
         statusMessage:
           type: string
           description: Eine optionale Meldung für die Operation
