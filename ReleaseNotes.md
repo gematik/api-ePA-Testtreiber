@@ -11,3 +11,10 @@
 - login with recordId
 - configuration added
 - PostEmailResponseDTO corrected
+
+
+## Release 3.0.2-2
+
+### Changes
+- fix for oneOf
+- C11885 single email instead of list
