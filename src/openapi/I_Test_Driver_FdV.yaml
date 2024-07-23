@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 3.0.4
+  version: 3.0.5
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -46,7 +46,7 @@ tags:
   - name: Directory
     description: search for LEI or DIGA at FHIR-VZD
   - name: Email Address Management
-    description: 'list, add or remove email addresses of an insurant'
+    description: 'set or update email address of an insurant'
 paths:
   /epa/testdriver/api/v1/login:
     get:
@@ -268,7 +268,9 @@ paths:
       operationId: retrieveDocuments
       parameters:
         - $ref: '#/components/parameters/recordId'
-        - $ref: '#/components/parameters/objectSelectorList'
+        - $ref: '#/components/parameters/entryUUID'
+        - $ref: '#/components/parameters/uniqueId'
+        - $ref: '#/components/parameters/title'
       responses:
         default:
           description: default response
@@ -326,7 +328,11 @@ paths:
       operationId: deleteObjects
       parameters:
         - $ref: '#/components/parameters/recordId'
-        - $ref: '#/components/parameters/objectSelectorList'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectSelectorList'
       responses:
         default:
           description: default response
@@ -465,6 +471,7 @@ paths:
         - Entitle Management
       summary: Delete a single specific entitlement
       description: 'This operation executes the use case "Delete an Entitlement" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId.'
+      operationId: deleteEntitlement
       parameters:
         - $ref: '#/components/parameters/recordId'
       responses:
@@ -523,6 +530,7 @@ paths:
         - Entitle Management
       summary: Delete a single specific blocked user
       description: 'This operation executes the use case "Delete an existing entry for a blocked user" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId.'
+      operationId: deleteBlockedUser
       parameters:
         - $ref: '#/components/parameters/recordId'
       responses:
@@ -797,54 +805,36 @@ paths:
     get:
       tags:
         - Email Address Management
-      summary: Get a list of all email addresses
-      description: Get a list of actual email addresses of an insurant
-      operationId: getEmailAddresses
+      summary: get stored email address
+      description: get stored email address of an insurant
+      operationId: getEmailAddress
       responses:
         default:
-          description: list of email addresses
-          content:
+           description: 'default response'
+           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetEmailResponseDTO'
-    post:
+    put:
       tags:
         - Email Address Management
-      summary: Set a single email address
-      operationId: setEmailAddress
+      summary: update email address
+      operationId: putEmailAddress
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostEmailRequestDTO'
+              $ref: '#/components/schemas/PutEmailRequestDTO'
       responses:
         default:
           description: response with an email address identifier
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostEmailResponseDTO'
+                $ref: '#/components/schemas/PutEmailResponseDTO'
 
-  /epa/testdriver/api/v1/emails/{identifier}:
-    parameters:
-      - in: path
-        name: identifier
-        schema:
-          $ref: '#/components/schemas/EmailIdentifierType'
-        required: true
-    delete:
-      tags:
-        - Email Address Management
-      summary: Delete an email address
-      operationId: deleteEmailAddress
-      responses:
-        default:
-          description: default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ResponseDTO'
+
 
   /epa/testdriver/api/v1/productinformation:
     get:
@@ -980,17 +970,6 @@ components:
           - document
           - folder
         default: document
-    objectSelectorList:
-      name: object
-      in: query
-      description: 'Select a list of objects identified by title, entry uuid or unique id'
-      required: true
-      schema:
-        type: array
-        minItems: 1
-        uniqueItems: true
-        items:
-          $ref: '#/components/schemas/ObjectSelectorItem'
     insurantId:
       name: insurantId
       in: query
@@ -1024,6 +1003,24 @@ components:
       description: Selected assignment id to execute the operation
       schema:
         $ref: '#/components/schemas/AssignmentIdType'
+    title:
+      name: title
+      in: query
+      description: title of the document object
+      schema:
+        type: string
+    entryUUID:
+      name: entryUUID
+      in: query
+      description: entry uuid of the document object
+      schema:
+        type: string
+    uniqueId:
+      name: uniqueId
+      in: query
+      description: unique id of the document object
+      schema:
+        type: string
   schemas:
     RequestDTO:
       description: Determines optionally the health record for the operation
@@ -1031,10 +1028,28 @@ components:
       properties:
         recordId:
           $ref: '#/components/schemas/KvnrType'
+    #---------------------------------------------------------------------------
+    # Parent class with discriminator 'entitlementType'
+    #---------------------------------------------------------------------------
     PostEntitlementRequestDTO:
-      description: 'In case of ambiguous display names the telematikId is given. One of both, display name or telematikId should be set.'
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
+      type: object
+      discriminator:
+        propertyName: entitlementType
+        mapping:
+          INSTITUTION: '#/components/schemas/PostEntitlementRequestInstDTO'
+          REPRESENTATIVE: '#/components/schemas/PostEntitlementRequestRepDTO'
+      properties:
+        entitlementType:
+          type: string
+    #---------------------------------------------------------------------------
+    # Concrete classes
+    #---------------------------------------------------------------------------
+    PostEntitlementRequestInstDTO:
+      description: 'In case of ambiguous display names the telematikId is given. One of both, display name or telematikId should be set.'
+      allOf:
+        - $ref: '#/components/schemas/PostEntitlementRequestDTO'
         - type: object
           required:
             - validTo
@@ -1047,7 +1062,7 @@ components:
               $ref: '#/components/schemas/DateTimeType'
     PostEntitlementRequestRepDTO:
       allOf:
-        - $ref: '#/components/schemas/RequestDTO'
+        - $ref: "#/components/schemas/PostEntitlementRequestDTO"
         - type: object
           required:
             - insurantId
@@ -1083,7 +1098,7 @@ components:
             - denyPolicy
           properties:
             denyPolicy:
-              $ref: '#/components/schemas/DenyPolicyAssignmentType'
+              $ref: '#/components/schemas/DenyPolicyAssignmentRequestType'
     PutRegisteredDeviceRequestDTO:
       allOf:
         - type: object
@@ -1156,13 +1171,16 @@ components:
           required:
             - object
             - documentWithMetadata
-    PostEmailRequestDTO:
-      type: object
-      properties:
-        email:
-          $ref: '#/components/schemas/EmailAddressType'
-      required:
-        - email
+
+    PutEmailRequestDTO:
+       $ref: '#/components/schemas/EmailAddressType'
+    PutEmailResponseDTO:
+       $ref: '#/components/schemas/ResponseDTO'
+    GetEmailResponseDTO:
+       allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - $ref: '#/components/schemas/EmailResponseType'
+
     ResponseDTO:
       description: 'Return of the success status, whether the operation on the service interface of Health Record System was successful or not. In any error case the status message, containing the error indication (e.g. error code) is given.'
       type: object
@@ -1466,22 +1484,8 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/DirectoryEntryWithCertificates'
-    GetEmailResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/ResponseDTO'
-        - type: object
-          properties:
-            emailAddresses:
-              type: array
-              items:
-                $ref: '#/components/schemas/EmailResponseType'
-    PostEmailResponseDTO:
-      allOf:
-        - $ref: '#/components/schemas/ResponseDTO'
-        - type: object
-          properties:
-            identifier:
-              $ref: '#/components/schemas/EmailIdentifierType'
+
+
     ProductInformationResponseDTO:
       type: object
       description: product information of epa fdv
@@ -2161,10 +2165,9 @@ components:
         - directoryEntry
         - certificates
     ActorIdType:
+      type: string
       description: Identifier of an actor (kvnr or telematik-id)
-      oneOf:
-        - $ref: '#/components/schemas/KvnrType'
-        - $ref: '#/components/schemas/TelematikIdType'
+      pattern: '(^[A-Z]{1}\d{9}$)|(^[1-9][0-9]?-[\x21-\x7E]+$)'
     KvnrType:
       type: string
       pattern: '^[A-Z]{1}\d{9}$'
@@ -2300,34 +2303,37 @@ components:
           $ref: '#/components/schemas/FunctionIdType'
         decision:
           $ref: '#/components/schemas/DecisionType'
-    DenyPolicyAssignmentType:
-      description: Basic type for a deny policy assignments.
-      oneOf:
-        - $ref: '#/components/schemas/GDPolicyAssignmentForDocumentType'
-        - $ref: '#/components/schemas/GDPolicyAssignmentForFolderType'
-        - $ref: '#/components/schemas/GDPolicyAssignmentForCategoryType'
     DenyPolicyAssignmentResponseType:
-      description: Basic type for a deny policy response.
-      allOf:
-        - type: object
-          properties:
-            assignmentId:
-              allOf:
-                - $ref: '#/components/schemas/AssignmentIdType'
-        - oneOf:
-            - $ref: '#/components/schemas/GDPolicyAssignmentForDocumentType'
-            - $ref: '#/components/schemas/GDPolicyAssignmentForFolderType'
-            - $ref: '#/components/schemas/GDPolicyAssignmentForCategoryType'
-    GDPolicyAssignmentForCategoryType:
-      description: Global deny policy assigment for a single category.
       type: object
+      description: Basic type for a deny policy response.
+      discriminator:
+        propertyName: policyAssignmentType
+        mapping:
+          FOR_DOCUMENT: '#/components/schemas/GDPolicyAssignmentForDocumentTypeResponse'
+          FOR_FOLDER: '#/components/schemas/GDPolicyAssignmentForFolderTypeResponse'
+          FOR_CATEGORY: '#/components/schemas/GDPolicyAssignmentForCategoryTypeResponse'
       properties:
-        for:
+        policyAssignmentType:
           type: string
-          enum:
-            - category
-        parameters:
-          type: object
+        assignmentId:
+          allOf:
+            - $ref: '#/components/schemas/AssignmentIdType'
+    DenyPolicyAssignmentRequestType:
+      type: object
+      description: Basic type for a deny policy assignments.
+      discriminator:
+        propertyName: policyAssignmentType
+        mapping:
+          FOR_DOCUMENT: '#/components/schemas/GDPolicyAssignmentForDocumentType'
+          FOR_FOLDER: '#/components/schemas/GDPolicyAssignmentForFolderType'
+          FOR_CATEGORY: '#/components/schemas/GDPolicyAssignmentForCategoryType'
+      properties:
+        policyAssignmentType:
+          type: string
+    GDPolicyAssignmentForCategoryTypeResponse:
+      allOf:
+        - $ref: '#/components/schemas/DenyPolicyAssignmentResponseType'
+        - type: object
           required:
             - categoryId
           properties:
@@ -2335,18 +2341,10 @@ components:
               allOf:
                 - $ref: '#/components/schemas/CategoryIdType'
               description: technical identifier of category
-          additionalProperties: false
-      additionalProperties: false
-    GDPolicyAssignmentForDocumentType:
-      description: Global deny policy assigment for a single document.
-      type: object
-      properties:
-        for:
-          type: string
-          enum:
-            - document
-        parameters:
-          type: object
+    GDPolicyAssignmentForDocumentTypeResponse:
+      allOf:
+        - $ref: '#/components/schemas/DenyPolicyAssignmentResponseType'
+        - type: object
           required:
             - rootDocumentId
           properties:
@@ -2354,18 +2352,10 @@ components:
               allOf:
                 - $ref: '#/components/schemas/RootDocumentIdType'
               description: rootDocumentUniqueId from DocumentEntry.referenceIdList
-          additionalProperties: false
-      additionalProperties: false
-    GDPolicyAssignmentForFolderType:
-      description: Global deny policy assigment for a single folder.
-      type: object
-      properties:
-        for:
-          type: string
-          enum:
-            - folder
-        parameters:
-          type: object
+    GDPolicyAssignmentForFolderTypeResponse:
+      allOf:
+        - $ref: '#/components/schemas/DenyPolicyAssignmentResponseType'
+        - type: object
           required:
             - folderUUID
           properties:
@@ -2373,8 +2363,42 @@ components:
               allOf:
                 - $ref: '#/components/schemas/UuidType'
               description: Folder.entryUUID
-          additionalProperties: false
-      additionalProperties: false
+    GDPolicyAssignmentForCategoryType:
+      description: Global deny policy assigment for a single category.
+      allOf:
+        - $ref: '#/components/schemas/DenyPolicyAssignmentRequestType'
+        - type: object
+          required:
+            - categoryId
+          properties:
+            categoryId:
+              allOf:
+                - $ref: '#/components/schemas/CategoryIdType'
+              description: technical identifier of category
+    GDPolicyAssignmentForDocumentType:
+      description: Global deny policy assigment for a single document.
+      allOf:
+        - $ref: '#/components/schemas/DenyPolicyAssignmentRequestType'
+        - type: object
+          required:
+            - rootDocumentId
+          properties:
+            rootDocumentId:
+              allOf:
+                - $ref: '#/components/schemas/RootDocumentIdType'
+              description: rootDocumentUniqueId from DocumentEntry.referenceIdList
+    GDPolicyAssignmentForFolderType:
+      description: Global deny policy assigment for a single folder.
+      allOf:
+        - $ref: '#/components/schemas/DenyPolicyAssignmentRequestType'
+        - type: object
+          required:
+            - folderUUID
+          properties:
+            folderUUID:
+              allOf:
+                - $ref: '#/components/schemas/UuidType'
+              description: Folder.entryUUID
     DeviceIdentifierType:
       type: string
       format: uuid
@@ -2527,71 +2551,79 @@ components:
                   resource:
                     $ref: '#/components/schemas/AuditEvent'
     ObjectSelectorItem:
-      oneOf:
-        - $ref: '#/components/schemas/Title'
-        - $ref: '#/components/schemas/EntryUUID'
-        - $ref: '#/components/schemas/UniqueId'
-      x-examples:
-        Example 1:
-          title: string
+      type: object
+      discriminator:
+        propertyName: selectorType
+        mapping:
+          TITLE: '#/components/schemas/Title'
+          ENTRY_ID: '#/components/schemas/EntryUUID'
+          UNIQUE_ID: '#/components/schemas/UniqueId'
+      properties:
+        selectorType:
+          enum:
+            - TITLE
+            - ENTRY_ID
+            - UNIQUE_ID
+      required:
+        - selectorType
     Title:
       type: object
-      properties:
-        title:
-          type: string
+      required:
+        - selectorType
+      allOf:
+        - $ref: '#/components/schemas/ObjectSelectorItem'
+        - type: object
+          properties:
+            title:
+              type: string
       x-examples:
         Example 1:
           title: string
     EntryUUID:
       type: object
-      properties:
-        entryUUID:
-          type: string
+      required:
+        - selectorType
+      allOf:
+        - $ref: '#/components/schemas/ObjectSelectorItem'
+        - type: object
+          properties:
+            entryUUID:
+              type: string
       x-examples:
         Example 2:
           entryUUID: string
     UniqueId:
       type: object
-      x-examples:
-        Example 1:
-          uniqueId: string
-      properties:
-        uniqueId:
-          type: string
+      required:
+        - selectorType
+      allOf:
+        - $ref: '#/components/schemas/ObjectSelectorItem'
+        - type: object
+          properties:
+            uniqueId:
+              type: string
+
     EmailAddressType:
       type: string
       description: email address
       format: email
       example: name@example.com
-    EmailIdentifierType:
-      type: string
-      description: Unique identifier of an email
-      example: '0815'
-    EmailType:
+
+    EmailResponseType:
       type: object
       properties:
         email:
           $ref: '#/components/schemas/EmailAddressType'
-        actor:
-          description: creator of the email address - name of user session
-          type: string
-          example: Betriebskrankenkasse ABC
-        createdAt:
-          description: timestamp of email registration
-          type: string
-          format: date-time
-          example: '2025-04-22T14:23:01Z'
-      required:
-        - email
-        - actor
-        - createdAt
-    EmailResponseType:
+
+    ObjectSelectorList:
       type: object
-      properties:
-        identifier:
-          $ref: '#/components/schemas/EmailIdentifierType'
-        emailType:
-          $ref: '#/components/schemas/EmailType'
+      description: 'Select a list of objects identified by title, entry uuid or unique id'
       required:
-        - identifier
-        - emailType
+        - objectSelectorList
+      properties:
+        objectSelectorList:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/ObjectSelectorItem'
