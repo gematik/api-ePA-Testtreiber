@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 3.0.5
+  version: 3.0.6
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -448,9 +448,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/PostEntitlementRequestDTO'
-                - $ref: '#/components/schemas/PostEntitlementRequestRepDTO'
+              $ref: '#/components/schemas/PostEntitlementRequestDTO'
       responses:
         default:
           description: default response
@@ -1028,21 +1026,23 @@ components:
       properties:
         recordId:
           $ref: '#/components/schemas/KvnrType'
+
     #---------------------------------------------------------------------------
     # Parent class with discriminator 'entitlementType'
     #---------------------------------------------------------------------------
     PostEntitlementRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
-      type: object
-      discriminator:
-        propertyName: entitlementType
-        mapping:
-          INSTITUTION: '#/components/schemas/PostEntitlementRequestInstDTO'
-          REPRESENTATIVE: '#/components/schemas/PostEntitlementRequestRepDTO'
-      properties:
-        entitlementType:
-          type: string
+        - type: object
+          properties:
+            entitlementType:
+              type: string
+          discriminator:
+            propertyName: entitlementType
+            mapping:
+              INSTITUTION: '#/components/schemas/PostEntitlementRequestInstDTO'
+              REPRESENTATIVE: '#/components/schemas/PostEntitlementRequestRepDTO'
+
     #---------------------------------------------------------------------------
     # Concrete classes
     #---------------------------------------------------------------------------
