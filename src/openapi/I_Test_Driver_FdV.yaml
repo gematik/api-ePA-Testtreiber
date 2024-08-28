@@ -2409,8 +2409,8 @@ components:
       type: string
       enum:
         - pending
-        - verified
-      example: verified
+        - confirmed
+      example: confirmed
     BaseDeviceType:
       type: object
       properties:
@@ -2419,7 +2419,7 @@ components:
         status:
           allOf:
             - $ref: '#/components/schemas/DeviceStatusType'
-          example: verified
+          example: confirmed
         displayName:
           $ref: '#/components/schemas/DisplayNameType'
         createdAt:
