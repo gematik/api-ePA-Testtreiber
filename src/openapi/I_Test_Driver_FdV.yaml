@@ -702,6 +702,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
+                
+  /epa/testdriver/api/v1/legalpolicy/{category}:
+    parameters:
+      - in: path
+        name: category
+        required: true
+        schema:
+          $ref: '#/components/schemas/CategoryIdType'
+      - in: query
+        name: professionOid
+        required: true
+        schema:
+          $ref: '#/components/schemas/OidType'
+    get:
+      tags:
+        - Legal Policy
+      summary: 'Get the principle permission to a category for a healthcare provider'
+      description: 'This operation reads the Tabelle 17: Legal Policy from the gemSpec_Aktensystem_ePAfueralle # A_19303 for a given LEI (with professionOID) and a data category and returns a list of CRUD rights for the specific combination. The result solely bases on the legal policy and will not consider constraints, blocked user, entitlement or consent decision.'
+      operationId: getLegalPolicy
+      responses:
+        default:
+          description: Response with CRUD rights
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalPolicyResponseDTO'
+              example:
+                Create: true
+                Read: false
+                Update: true
+                Delete: false
 
   /epa/testdriver/api/v1/medication:
     get:
@@ -1517,6 +1548,22 @@ components:
         - productVersion
         - productType
         - productTypeVersion
+    LegalPolicyResponseDTO:
+      type: object
+      properties:
+        Create:
+          type: boolean
+        Read:
+          type: boolean
+        Update:
+          type: boolean
+        Delete:
+          type: boolean
+      required:
+        - Create
+        - Read
+        - Update
+        - Delete        
     AuthorInstitution:
       type: object
       description: 'Institution, which is related to the author'
@@ -2226,6 +2273,7 @@ components:
         - emergency
         - eab
         - dental
+        - childsrecord        
         - child
         - pregnancy_childbirth
         - vaccination
