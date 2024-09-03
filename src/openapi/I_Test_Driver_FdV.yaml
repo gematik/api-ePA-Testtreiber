@@ -58,6 +58,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/insurantId'
         - $ref: '#/components/parameters/recordId'
+        - $ref: '#/components/parameters/authorizeRepresentative'        
       responses:
         default:
           description: default response
@@ -1050,6 +1051,12 @@ components:
       description: unique id of the document object
       schema:
         type: string
+    authorizeRepresentative:
+      name: authorizeRepresentative
+      in: query
+      description: optional parameter, if set to true the operation establishes a user session on the FdV for the use case "Manage representation at third-party FdV". The FdV then calls the operation _sendAuthorizationRequestFdV_ with _x-authorize-representative = true_ and the operation _sendAuthCodeFdV_ without device information (_x-device-identifier_ and _x-device-identifier_ or _x-device-attestation_) . In the established user session, the user only has access to entitlement management.
+      schema:
+        type: boolean      
   schemas:
     RequestDTO:
       description: Determines optionally the health record for the operation
