@@ -328,11 +328,6 @@ paths:
       operationId: deleteObjects
       parameters:
         - $ref: '#/components/parameters/recordId'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ObjectSelectorList'
       responses:
         default:
           description: default response
