@@ -1,8 +1,8 @@
 @Library('gematik-jenkins-shared-library') _
 
-def CREDENTIAL_ID_GEMATIK_GIT = 'GITLAB.tst_tt_build.Username_Password'
+def CREDENTIAL_ID_GEMATIK_GIT = 'svc_gitlab_prod_credentials'
 def REPO_URL = createGitUrl('git/Testtools/ePA/epa-fdv-testdriver-api')
-def BRANCH = 'main'
+def BRANCH = (target == 'epa3.0') ? 'main' : target
 def JIRA_PROJECT_ID = 'EPT'
 def TEAMS_URL = 'https://gematikde.webhook.office.com/webhookb2/01cda61b-5c5e-4000-ad6a-7b087feaf0e8@30092c62-4dbf-43bf-a33f-10d21b5b660a/IncomingWebhook/8cbb77af22234c81bbecb8822d3b25fb/a8e7e03f-9a7f-4dce-ba23-6f130fa63ee4'
 
@@ -25,6 +25,7 @@ pipeline {
     agent { label 'k8-backend-small' }
 
         parameters {
+            choice(name: 'target', choices: ['epa3.0', 'epa3.1'], description: 'Select the branch (head) on which the tag is to be created')
             choice(name: 'GITHUB', choices: ['YES', 'NO'], description: 'GitHub-Release wird ausgeführt.')
         }
 
@@ -41,19 +42,28 @@ pipeline {
             }
         }
 
-		stage('Configure Versions') {
+        stage('Configure Versions') {
             steps {
                 script {
                     // JIRA_RELEASE_VERSION comes from Jenkins Manual Trigger (format: JIRA_PROJECT_PREFIX-X.Y.Z)
                     VERSION = "${JIRA_RELEASE_VERSION}".split('-')[JIRA_VERSION_DASH_POSITION]
-                    NEXT_VERSION = getNextVersion(VERSION, 'patch')
+
+                    if (VERSION == "3.1.0") {
+                        // ----------------- currently we release only candidates -----------------
+                        def splitted = JIRA_RELEASE_VERSION.split("rc")
+                        NEXT_VERSION = splitted[0] + 'rc' + ((splitted[1] as int) + 1)
+                        VERSION = VERSION + '-rc' + splitted[1]
+                        // ------------------------------------------------------------------------
+                    } else {
+                        NEXT_VERSION = getNextVersion(VERSION, 'patch')
+                    }
 
                     if ("${NEXT_VERSION}" == "${VERSION}") {
                         currentBuild.result = 'ABORTED'
                         error('NEXT_VERSION must be different than VERSION')
                     }
 
-					TAGNAME = "${JIRA_RELEASE_VERSION}"
+                    TAGNAME = "${JIRA_RELEASE_VERSION}"
 
                     echo 'Summary of Versions:'
                     echo "Release Branch: ${BRANCH}"
@@ -79,13 +89,13 @@ pipeline {
             }
         }
 
-		stage('Release Jira-Version') {
+        stage('Release Jira-Version') {
             steps {
                 jiraReleaseVersion(JIRA_PROJECT_ID, JIRA_RELEASE_VERSION)
             }
         }
 
-		stage('Create New Jira-Version') {
+        stage('Create New Jira-Version') {
             steps {
                 script {
                     try {
@@ -98,7 +108,7 @@ pipeline {
             }
         }
 
-		stage('GitHub-Release') {
+        stage('GitHub-Release') {
             when {
                 expression { params.GITHUB == 'YES' }
             }
@@ -110,13 +120,13 @@ pipeline {
                     string(name: 'BRANCH', value: String.valueOf(BRANCH)),
                     string(name: 'AUTOMATIC_MERGE', value: String.valueOf('YES')),
                     string(name: 'GITHUB_TAG', value: String.valueOf("${VERSION}")),
+                    string(name: 'REMOTE_BRANCH', value: String.valueOf(BRANCH)),
                ]
             }
         }
     }
-	post {
+    post {
         always {
-            showJUnitAsXUnitResult()
             sendEMailNotification(getPatientEMailList())
         }
     }

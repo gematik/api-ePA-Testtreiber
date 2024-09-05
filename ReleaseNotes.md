@@ -2,19 +2,25 @@
 
 # Release notes epa-fdv testdriver api for ePA 3.x and above
 
-## Release 3.0.2
+## Release candidate 3.1.0
+### Changes
+- adds entitlement for ncpeh 
+- adds path researchdatapurposes
+- corrects description für put device management
 
+## Release 3.0.2-2 api Version 3.0.6
+### Changes
+- fix for PostEntitlementRequestDTO
+- 
+## Release 3.0.2-2
+### Changes
+- fix for oneOf
+- C11885 single email instead of list
+
+### Release 3.0.2
 - Initial version
 - Applied from https://github.com/gematik/ePA-Basic/blob/ePA-3.0.2/src/openapi/I_Test_Driver_FdV.yaml (pre-realase version 3.0.2)
-
 ### Changes
 - login with recordId
 - configuration added
 - PostEmailResponseDTO corrected
-
-
-## Release 3.0.2-2
-
-### Changes
-- fix for oneOf
-- C11885 single email instead of list
