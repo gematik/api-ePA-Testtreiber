@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 3.0.5
+  version: 3.1.0
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -33,6 +33,8 @@ tags:
     description: 'list, update, add or remove entitlements, list or configure the blocked user policy'
   - name: Consent Decision Management
     description: list or update entries the consent decision management
+  - name: ResearchDataPurposes
+    description: list or update the research purposes
   - name: Constraint Management
     description: 'list, add or remove the general deny policy'
   - name: Device Management
@@ -47,6 +49,10 @@ tags:
     description: search for LEI or DIGA at FHIR-VZD
   - name: Email Address Management
     description: 'set or update email address of an insurant'
+  - name: Legal Policy
+    description: 'Legally binding regulations for access rights'
+
+
 paths:
   /epa/testdriver/api/v1/login:
     get:
@@ -58,6 +64,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/insurantId'
         - $ref: '#/components/parameters/recordId'
+        - $ref: '#/components/parameters/authorizeRepresentative'        
       responses:
         default:
           description: default response
@@ -448,9 +455,7 @@ paths:
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/PostEntitlementRequestDTO'
-                - $ref: '#/components/schemas/PostEntitlementRequestRepDTO'
+              $ref: '#/components/schemas/PostEntitlementRequestDTO'
       responses:
         default:
           description: default response
@@ -585,6 +590,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
 
+  /epa/testdriver/api/v1/researchdatapurposes:
+    get:
+      tags:
+        - ResearchDataPurposes
+      summary: Get a list of all research data purposes
+      description: 'This operation executes the use case "List all research data purposes" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: getResearchDataPurposes
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResearchDataPurposesResponseDTO'
+
+  /epa/testdriver/api/v1/researchdatapurposes/{purposeId}:
+    put:
+      tags:
+        - ResearchDataPurposes
+      summary: Update decision for a research data purpose
+      description: 'This operation executes the use case "Update decision for a research data purpose" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: putResearchDataPurpose
+      parameters:
+        - in: path
+          name: purposeId
+          schema:
+            $ref: '#/components/schemas/PurposeIdType'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionType'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+
   /epa/testdriver/api/v1/constraints:
     get:
       tags:
@@ -663,8 +713,8 @@ paths:
     put:
       tags:
         - Device Management
-      summary: Add a new device as registered devices for a user (associated to kvnr of requestor).
-      description: This operation executes the use case "Add a registered device" in an existing user session.
+      summary: Change display name for registered device
+      description: This operation executes the use case "Change display name for registered device" in an existing user session.
       operationId: putRegisteredDevice
       parameters:
         - in: path
@@ -704,6 +754,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
+                
+  /epa/testdriver/api/v1/legalpolicy/{category}:
+    parameters:
+      - in: path
+        name: category
+        required: true
+        schema:
+          $ref: '#/components/schemas/CategoryIdType'
+      - in: query
+        name: professionOid
+        required: true
+        schema:
+          $ref: '#/components/schemas/OidType'
+    get:
+      tags:
+        - Legal Policy
+      summary: 'Get the principle permission to a category for a healthcare provider'
+      description: 'This operation reads the Tabelle 17: Legal Policy from the gemSpec_Aktensystem_ePAfueralle # A_19303 for a given LEI (with professionOID) and a data category and returns a list of CRUD rights for the specific combination. The result solely bases on the legal policy and will not consider constraints, blocked user, entitlement or consent decision.'
+      operationId: getLegalPolicy
+      responses:
+        default:
+          description: Response with CRUD rights
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalPolicyResponseDTO'
+              example:
+                Create: true
+                Read: false
+                Update: true
+                Delete: false
 
   /epa/testdriver/api/v1/medication:
     get:
@@ -1021,6 +1102,12 @@ components:
       description: unique id of the document object
       schema:
         type: string
+    authorizeRepresentative:
+      name: authorizeRepresentative
+      in: query
+      description: optional parameter, if set to true the operation establishes a user session on the FdV for the use case "Manage representation at third-party FdV". The FdV then calls the operation _sendAuthorizationRequestFdV_ with _x-authorize-representative = true_ and the operation _sendAuthCodeFdV_ without device information (_x-device-identifier_ and _x-device-identifier_ or _x-device-attestation_) . In the established user session, the user only has access to entitlement management.
+      schema:
+        type: boolean      
   schemas:
     RequestDTO:
       description: Determines optionally the health record for the operation
@@ -1028,21 +1115,23 @@ components:
       properties:
         recordId:
           $ref: '#/components/schemas/KvnrType'
+
     #---------------------------------------------------------------------------
     # Parent class with discriminator 'entitlementType'
     #---------------------------------------------------------------------------
     PostEntitlementRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
-      type: object
-      discriminator:
-        propertyName: entitlementType
-        mapping:
-          INSTITUTION: '#/components/schemas/PostEntitlementRequestInstDTO'
-          REPRESENTATIVE: '#/components/schemas/PostEntitlementRequestRepDTO'
-      properties:
-        entitlementType:
-          type: string
+        - type: object
+          properties:
+            entitlementType:
+              type: string
+          discriminator:
+            propertyName: entitlementType
+            mapping:
+              INSTITUTION: '#/components/schemas/PostEntitlementRequestInstDTO'
+              REPRESENTATIVE: '#/components/schemas/PostEntitlementRequestRepDTO'
+
     #---------------------------------------------------------------------------
     # Concrete classes
     #---------------------------------------------------------------------------
@@ -1213,6 +1302,44 @@ components:
           properties:
             configurationEntry:
               $ref: '#/components/schemas/ConfigurationEntry'
+
+    GetResearchDataPurposesResponseDTO:
+      description: Returns a list of all research data purposes
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          required:
+            - researchDataPurposes
+          properties:
+            researchDataPurposes:
+              type: array
+              items:
+                $ref: '#/components/schemas/ResearchDataPurposeEntry'
+
+    ResearchDataPurposeEntry:
+      description: 'State of consent(permit or deny) to a purpose referring §303e SGB V clause 2'
+      type: object
+      properties:
+        purposeId:
+           $ref: '#/components/schemas/PurposeIdType'
+        decision:
+           $ref: '#/components/schemas/DecisionType'
+
+    PurposeIdType:
+      description: 'The purposeId is the key value of the research data purpose'
+      type: string
+      enum:
+            - purpose1
+            - purpose2
+            - purpose3
+            - purpose4
+            - purpose5
+            - purpose6
+            - purpose7
+            - purpose8
+            - purpose9
+            - purpose10
+
     GetConfigurationResponseDTO:
       description: Returns a list of all configuration parameters of the FdV with the set values
       allOf:
@@ -1517,6 +1644,22 @@ components:
         - productVersion
         - productType
         - productTypeVersion
+    LegalPolicyResponseDTO:
+      type: object
+      properties:
+        Create:
+          type: boolean
+        Read:
+          type: boolean
+        Update:
+          type: boolean
+        Delete:
+          type: boolean
+      required:
+        - Create
+        - Read
+        - Update
+        - Delete        
     AuthorInstitution:
       type: object
       description: 'Institution, which is related to the author'
@@ -2196,6 +2339,10 @@ components:
       example: '2025-01-01T18:00:00Z'
     FunctionIdType:
       type: string
+      enum:
+        - erp-submission
+        - research-submission
+        - medication
       description: function id of consent related functions of a health record.
     DecisionType:
       type: string
@@ -2226,6 +2373,7 @@ components:
         - emergency
         - eab
         - dental
+        - childsrecord        
         - child
         - pregnancy_childbirth
         - vaccination

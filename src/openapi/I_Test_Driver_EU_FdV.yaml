@@ -1,0 +1,184 @@
+openapi: 3.0.3
+info:
+  title: I_Test_Driver_FdV_EU
+  description: 'REST Test Interface for the Insurant´s User Frontend (FdV) for use case: authorize EU access.'
+  version: 1.0.0
+  contact:
+    name: gematik GmbH
+    email: software-development@gematik.de
+    url: 'https://www.gematik.de'
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+servers:
+  - url: '{protocol}://{host}:{port}/{api}'
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: https
+      host:
+        default: localhost
+      port:
+        default: '443'
+      api:
+        default: fdv-testdriver
+tags:
+  - name: Entitle Management EU
+    description: 'set or get entitlement for ncpeh'
+
+paths:
+  /epa/testdriver/api/v1/ncpeh/entitlement:
+    put:
+      tags:
+        - Entitle Management EU
+      summary: 'Set entitlement for ncpeh'
+      operationId: putEntitlementNcpeh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutEntitlementNcpehRequestDTO'
+      responses:
+        default:
+          description: default response for postEntitlementNcpeh
+          content:
+             application/json:
+                schema:
+                    $ref: '#/components/schemas/PutEntitlementNcpehResponseDTO'
+    get:
+        tags:
+            - Entitle Management EU
+        summary: 'Get entitlement for ncpeh'
+        operationId: getEntitlementNcpeh
+        parameters:
+           - $ref: '#/components/parameters/recordId'
+        responses:
+          default:
+           description: default response for getEntitlementNcpeh
+           content:
+             application/json:
+              schema:
+                $ref: '#/components/schemas/GetEntitlementNcpehResponseDTO'
+
+    delete:
+      tags:
+        - Entitle Management EU
+      summary: 'Delete entitlement for ncpeh'
+      operationId: deleteEntitlementNcpeh
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response for deleteEntitlementNcpeh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+components:
+  parameters:
+    recordId:
+      name: recordId
+      in: query
+      description: Determines optionally the health record for the operation
+      schema:
+        $ref: '#/components/schemas/KvnrType'
+
+
+
+  schemas:
+    AccessCodeType:
+      type: string
+      example: A2C4E6
+    KvnrType:
+      type: string
+      pattern: '^[A-Z]{1}\d{9}$'
+      example: Z123456789
+    TelematikIdType:
+      type: string
+      pattern: '^[1-9][0-9]?-[\x21-\x7E]+$'
+      maxLength: 128
+      example: 9-883110000035981
+    OidType:
+      description: A professionOID
+      type: string
+      pattern: '([0-2])((\.0)|(\.[1-9][0-9]*))*$'
+      example: 1.2.276.0.76.4.50
+    DisplayNameNcpehType:
+      description: A readable name
+      type: string
+      example: Frankreich (FR)
+    DateTimeType:
+      type: string
+      format: date-time
+      example: '2025-01-01T18:00:00Z'
+
+
+    EntitlementNcpeh:
+      description: EntitlementNcpeh object
+      type: object
+      properties:
+          countryName:
+            $ref: '#/components/schemas/DisplayNameNcpehType'
+          validTo:
+            $ref: '#/components/schemas/DateTimeType'
+          kvnr:
+            $ref: '#/components/schemas/KvnrType'
+
+    RequestDTO:
+      description: Determines optionally the health record for the operation
+      type: object
+      properties:
+        recordId:
+          $ref: '#/components/schemas/KvnrType'
+    ResponseDTO:
+      description: 'Return of the success status, whether the operation on the service interface of Health Record System was successful or not. In any error case the status message, containing the error indication (e.g. error code) is given.'
+      type: object
+      properties:
+        success:
+          type: boolean
+        statusMessage:
+          type: string
+      required:
+        - success
+    PutEntitlementNcpehRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/RequestDTO'
+        - type: object
+          properties:
+            countryName:
+              $ref: '#/components/schemas/DisplayNameNcpehType'
+
+    PutEntitlementNcpehResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          properties:
+            entitlement:
+              $ref: '#/components/schemas/EntitlementNcpeh'
+            accesscode:
+              $ref: '#/components/schemas/AccessCodeType'
+            tid:
+              $ref: '#/components/schemas/TelematikIdType'
+          required:
+            - entitlement
+            - accesscode
+            - tid
+    GetEntitlementNcpehResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          properties:
+            entitlement:
+              $ref: '#/components/schemas/EntitlementNcpeh'
+            accesscode:
+              $ref: '#/components/schemas/AccessCodeType'
+          required:
+            - entitlement
+            - accesscode
+
+
+
