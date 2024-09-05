@@ -720,7 +720,7 @@ paths:
                   - confirmationCode
                 properties:
                   confirmationCode:
-                    $ref: '#/components/parameters/confirmationCodeType'
+                    $ref: '#/components/schemas/ConfirmationCodeType'
               example:
                 confirmationCode: '654321'
       responses:
@@ -1047,14 +1047,13 @@ components:
       description: unique id of the document object
       schema:
         type: string
-    confirmationCodeType:
+    confirmationCode:
       name: confirmationCode
       in: query
+      required: true
       description: 6-digit confirmation code for device registration confirmation.
       schema:
-        type: string
-        pattern: '^\d{6}$'
-        example: '123456'      
+        $ref: '#/components/schemas/ConfirmationCodeType' 
   schemas:
     RequestDTO:
       description: Determines optionally the health record for the operation
@@ -2663,3 +2662,7 @@ components:
           uniqueItems: true
           items:
             $ref: '#/components/schemas/ObjectSelectorItem'
+    ConfirmationCodeType:
+      type: string
+      pattern: '^\d{6}$'
+      example: '123456'
