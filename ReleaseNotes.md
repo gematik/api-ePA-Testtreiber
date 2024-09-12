@@ -6,6 +6,8 @@
 - add authorizeRepresentative param to login operation
 - add LegalPolicy for a category endpoint
 - corrects description für put device management
+- add confirmPendingDevice & confirmationCodeType
+- add postDeviceManagement endpoint
 
 ## Release 3.0.2-2 api Version 3.0.6
 ### Changes
