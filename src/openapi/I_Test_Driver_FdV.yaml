@@ -1090,7 +1090,7 @@ components:
             - validTo
           properties:
             hci_DisplayName:
-              $ref: '#/components/schemas/DeviceDisplayNameType'
+              $ref: '#/components/schemas/DisplayNameType'
             hci_TelematikId:
               $ref: '#/components/schemas/TelematikIdType'
             validTo:
@@ -1141,7 +1141,7 @@ components:
             - displayName
           properties:
             displayName:
-              $ref: '#/components/schemas/DisplayNameType'
+              $ref: '#/components/schemas/DeviceDisplayNameType'
     StoreDocumentRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
