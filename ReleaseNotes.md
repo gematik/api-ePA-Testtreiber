@@ -1,6 +1,12 @@
 <img width="200" height="37" src="images/Gematik_Logo_Flag_With_Background.png" alt="Gematik Logo"/> <br/>
 
 # Release notes epa-fdv testdriver api for ePA 3.x and above
+## Release candidate 3.0.2-4 api Version 3.0.7
+### Changes
+- add authorizeRepresentative param to login operation
+- add LegalPolicy for a category endpoint
+- corrects description für put device management
+
 ## Release 3.0.2-2 api Version 3.0.6
 ### Changes
 - fix for PostEntitlementRequestDTO
@@ -17,4 +23,3 @@
 - login with recordId
 - configuration added
 - PostEmailResponseDTO corrected
-
