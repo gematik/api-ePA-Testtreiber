@@ -661,6 +661,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetRegisteredDevicesResponseDTO'
+    post:
+      tags:
+        - Device Management
+      summary: Get a new device registration
+      description: This operation initializes the registration of a new device with the Device Management
+      operationId: postRegisterDevice
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceName
+              properties:
+                deviceName:
+                  $ref: '#/components/schemas/DeviceDisplayNameType'
+            example:
+              deviceName: "My phone"
+      responses:
+        default:
+          description: default
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deviceIdentifier:
+                    $ref: '#/components/schemas/DeviceIdentifierType'
+                  deviceToken:
+                    $ref: '#/components/schemas/DeviceTokenType'
+                  data:
+                    $ref: '#/components/schemas/PendingDeviceType'
+                  emailNotification:
+                    $ref: '#/components/schemas/EmailAddressType'
 
   /epa/testdriver/api/v1/devicemanagement/{deviceidentifier}:
     put:
@@ -1148,7 +1183,7 @@ components:
             - displayName
           properties:
             displayName:
-              $ref: '#/components/schemas/DisplayNameType'
+              $ref: '#/components/schemas/DeviceDisplayNameType'
     StoreDocumentRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
@@ -2463,6 +2498,10 @@ components:
       format: uuid
       description: Unique identifier of a device registration
       example: 74f09dbc-9268-411f-81e7-f1e4f3fb1b4f
+    DeviceTokenType:
+      type: string
+      description: "Device tokens are strings with 64 hexadecimal symbols."
+      example: "fe6b98ac23a3df214612fd089494eb2946589012a94e91ba6ed57f9213ba520a"         
     DeviceStatusType:
       description: current status of device registration
       type: string
@@ -2470,6 +2509,21 @@ components:
         - pending
         - verified
       example: verified
+    DeviceDisplayNameType:
+      description: A readable name
+      type: string
+      example: This is my preferred device for ePA
+    PendingDeviceType:
+      allOf:
+        - $ref: '#/components/schemas/BaseDeviceType'
+        - type: object
+          properties:
+            remainingConfirmationRetries:
+              description: Indication of acceptable consecutive failed confirmation attemps
+              type: integer
+              maximum: 4
+              minimum: 0
+              example: 4           
     BaseDeviceType:
       type: object
       properties:
