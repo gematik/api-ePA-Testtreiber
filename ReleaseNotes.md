@@ -6,18 +6,25 @@
 ### Changes
 - adds entitlement for ncpeh 
 - adds path researchdatapurposes
+
+## Release candidate 3.0.2-4 api Version 3.0.7
+### Changes
+- add authorizeRepresentative param to login operation
+- add LegalPolicy for a category endpoint
 - corrects description für put device management
+- add confirmPendingDevice & confirmationCodeType
+- add postDeviceManagement endpoint
 
 ## Release 3.0.2-2 api Version 3.0.6
 ### Changes
 - fix for PostEntitlementRequestDTO
-- 
+
 ## Release 3.0.2-2
 ### Changes
 - fix for oneOf
 - C11885 single email instead of list
 
-### Release 3.0.2
+## Release 3.0.2
 - Initial version
 - Applied from https://github.com/gematik/ePA-Basic/blob/ePA-3.0.2/src/openapi/I_Test_Driver_FdV.yaml (pre-realase version 3.0.2)
 ### Changes
