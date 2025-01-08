@@ -617,6 +617,7 @@ paths:
       description: 'This operation executes the use case "Update decision for a research data purpose" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
       operationId: putResearchDataPurpose
       parameters:
+        - $ref: '#/components/parameters/recordId'
         - in: path
           name: purposeId
           schema:
