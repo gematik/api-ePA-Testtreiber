@@ -359,6 +359,8 @@ paths:
         - $ref: '#/components/parameters/vzdOrgType'
         - $ref: '#/components/parameters/vzdOrgName'
         - $ref: '#/components/parameters/vzdOrgAlias'
+        - $ref: '#/components/parameters/vzdOrgProfessionOid'
+        - $ref: '#/components/parameters/vzdOrgTelematikId'
       responses:
         '200':
           description: A list of resources
@@ -615,6 +617,7 @@ paths:
       description: 'This operation executes the use case "Update decision for a research data purpose" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
       operationId: putResearchDataPurpose
       parameters:
+        - $ref: '#/components/parameters/recordId'
         - in: path
           name: purposeId
           schema:
@@ -1071,19 +1074,37 @@ components:
         enum:
           - hcpo
           - diga
+          - ncpeh
       required: true
     vzdOrgName:
       name: name
       in: query
-      description: Name used for the organization
+      description: 'Name used for the organization. For NCPeH: The country name in German in its Kurzform [LVZ] (e.g. "Frankreich")'
       schema:
         type: string
     vzdOrgAlias:
       name: alias
       in: query
-      description: 'Alternate name that the organization is known as, or was known as in the past'
+      description: 'Alternate name that the organization is known as, or was known as in the past. For NCPeH: The country code from DIN EN ISO 3166-1 [LVZ] (e.g. "FR")'
       schema:
         type: string
+    vzdOrgProfessionOid:
+      name: professionOID
+      in: query
+      description: 'ProfessionOID of the organization. For NCPeH: oid_ncpeh'
+      schema:
+        type: string
+        pattern: '([0-2])((\.0)|(\.[1-9][0-9]*))*$'
+        example: 1.2.276.0.76.4.50
+    vzdOrgTelematikId:
+      name: telematikID
+      in: query
+      description: 'TelematikID of the organization.'
+      schema:
+        type: string
+        pattern: '^[1-9][0-9]?-[\x21-\x7E]+$'
+        maxLength: 128
+        example: 2-883110000118994  
     auditSinceLastLogin:
       name: sinceLastLogin
       in: query
