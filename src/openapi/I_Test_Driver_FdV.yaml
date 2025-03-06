@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 3.0.6
+  version: 4.0.1
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -33,6 +33,8 @@ tags:
     description: 'list, update, add or remove entitlements, list or configure the blocked user policy'
   - name: Consent Decision Management
     description: list or update entries the consent decision management
+  - name: Deny List Medication
+    description: 'list, add or remove entries of the deny list medication'
   - name: Constraint Management
     description: 'list, add or remove the general deny policy'
   - name: Device Management
@@ -47,6 +49,10 @@ tags:
     description: search for LEI or DIGA at FHIR-VZD
   - name: Email Address Management
     description: 'set or update email address of an insurant'
+  - name: Legal Policy
+    description: 'Legally binding regulations for access rights'
+
+
 paths:
   /epa/testdriver/api/v1/login:
     get:
@@ -58,6 +64,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/insurantId'
         - $ref: '#/components/parameters/recordId'
+        - $ref: '#/components/parameters/authorizeRepresentative'
       responses:
         default:
           description: default response
@@ -102,6 +109,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
+
+  /epa/testdriver/api/v1/deleteDocuments:
+    post:
+      tags:
+        - XDS Document
+      summary: Delete documents in health record
+      description: 'This operation executes the use case "Delete Documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: deleteDocuments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteDocumentRequestDTO'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /epa/testdriver/api/v1/retrieveDocuments:
+    post:
+      tags:
+        - XDS Document
+      summary: Download documents from health record
+      description: 'This operation executes the use case "Retrieve Documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: retrieveDocuments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetrieveDocumentsRequestDTO'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrieveDocumentsResponseDTO'
 
   /epa/testdriver/api/v1/findObjects:
     post:
@@ -265,6 +312,7 @@ paths:
         - XDS Document
       summary: Download documents from health record
       description: 'This operation executes the use case "Download documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId. The documents to download are referenced by their id, found before by finddocuments.'
+      deprecated: true
       operationId: retrieveDocuments
       parameters:
         - $ref: '#/components/parameters/recordId'
@@ -325,6 +373,7 @@ paths:
         - XDS Document
       summary: Delete documents or folders in the health record
       description: 'This operation executes the use case "Delete documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId. The documents to delete are referenced by their id, found before by finddocuments.'
+      deprecated: true
       operationId: deleteObjects
       parameters:
         - $ref: '#/components/parameters/recordId'
@@ -539,6 +588,65 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
 
+  /epa/testdriver/api/v1/UserSpecificMedicationDenyList:
+    get:
+      tags:
+        - Deny List Medication
+      summary: Get a list of all entries of User Specific Deny List Medication
+      description: 'This operation executes the use case "List all user specific medication deny list entries" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: getUserSpecificMedicationDenyList
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserSpecificMedicationDenyListResponseDTO'
+
+  /epa/testdriver/api/v1/UserSpecificMedicationDenyList/{telematikId}:
+    parameters:
+     - in: path
+       name: telematikId
+       schema:
+         $ref: '#/components/schemas/TelematikIdType'
+       required: true
+    put:
+      tags:
+        - Deny List Medication
+      summary: Create an entry in User Specific Deny List Medication
+      description: 'This operation executes the use case "contradict the use of the Medication Service by a specific LEI". By default, the health record of the user is addressed, otherwise the health record is identified by "recordId.'
+      operationId: putUserSpecificMedicationDenyListEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutUserSpecificMedicationDenyListEntryRequestDTO'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+    delete:
+      tags:
+        - Deny List Medication
+      summary: Delete a single entry of User Specific Deny List Medication
+      description: 'This operation executes the use case "Delete an existing entry for a User Specific Deny List Medication". By default, the health record of the user is addressed, otherwise the health record is identified by "recordId.'
+      operationId: deleteUserSpecificMedicationDenyListEntry
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
   /epa/testdriver/api/v1/consentDecision:
     get:
       tags:
@@ -656,13 +764,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetRegisteredDevicesResponseDTO'
+    post:
+      tags:
+        - Device Management
+      summary: Get a new device registration
+      description: This operation initializes the registration of a new device with the Device Management
+      operationId: postRegisterDevice
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceName
+              properties:
+                deviceName:
+                  $ref: '#/components/schemas/DeviceDisplayNameType'
+            example:
+              deviceName: "My phone"
+      responses:
+        default:
+          description: default
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deviceIdentifier:
+                    $ref: '#/components/schemas/DeviceIdentifierType'
+                  deviceToken:
+                    $ref: '#/components/schemas/DeviceTokenType'
+                  data:
+                    $ref: '#/components/schemas/PendingDeviceType'
+                  emailNotification:
+                    $ref: '#/components/schemas/EmailAddressType'
 
   /epa/testdriver/api/v1/devicemanagement/{deviceidentifier}:
     put:
       tags:
         - Device Management
-      summary: Add a new device as registered devices for a user (associated to kvnr of requestor).
-      description: This operation executes the use case "Add a registered device" in an existing user session.
+      summary: Change display name for registered device
+      description: This operation executes the use case "Change display name for registered device" in an existing user session.
       operationId: putRegisteredDevice
       parameters:
         - in: path
@@ -702,6 +845,65 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
+
+  /epa/testdriver/api/v1/devicemanagement/confirmPendingDevice:
+    post:
+      tags:
+        - Device Management
+      summary: 'Enter device registration code (Confirmation Code)'
+      description: 'This request sends the confirmationCode to the Device Management Service, to confirm a pending device registration. If the confirmation code was wrong, the number of remaining retries is returned in the ResponseDTO.statusMessage.'
+      operationId: postConfirmPendingDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - confirmationCode
+              properties:
+                confirmationCode:
+                  $ref: '#/components/schemas/ConfirmationCodeType'
+            example:
+              confirmationCode: '654321'
+      responses:
+        default:
+          description: 'ResponseDTO with success == true OR when the confirmation code was wrong, with success == false and statusMessage with the response from the Device Management with errorCode == invalidCode and errorDetail with the number of remaining retries.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /epa/testdriver/api/v1/legalpolicy/{category}:
+    parameters:
+      - in: path
+        name: category
+        required: true
+        schema:
+          $ref: '#/components/schemas/CategoryIdType'
+      - in: query
+        name: professionOid
+        required: true
+        schema:
+          $ref: '#/components/schemas/OidType'
+    get:
+      tags:
+        - Legal Policy
+      summary: 'Get the principle permission to a category for a healthcare provider'
+      description: 'This operation reads the Tabelle 17: Legal Policy from the gemSpec_Aktensystem_ePAfueralle # A_19303 for a given LEI (with professionOID) and a data category and returns a list of CRUD rights for the specific combination. The result solely bases on the legal policy and will not consider constraints, blocked user, entitlement or consent decision.'
+      operationId: getLegalPolicy
+      responses:
+        default:
+          description: Response with CRUD rights
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LegalPolicyResponseDTO'
+              example:
+                Create: true
+                Read: false
+                Update: true
+                Delete: false
 
   /epa/testdriver/api/v1/medication:
     get:
@@ -808,8 +1010,8 @@ paths:
       operationId: getEmailAddress
       responses:
         default:
-           description: 'default response'
-           content:
+          description: 'default response'
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GetEmailResponseDTO'
@@ -1019,6 +1221,19 @@ components:
       description: unique id of the document object
       schema:
         type: string
+    authorizeRepresentative:
+      name: authorizeRepresentative
+      in: query
+      description: optional parameter, if set to true the operation establishes a user session on the FdV for the use case "Manage representation at third-party FdV". The FdV then calls the operation _sendAuthorizationRequestFdV_ with _x-authorize-representative = true_ and the operation _sendAuthCodeFdV_ without device information (_x-device-identifier_ and _x-device-identifier_ or _x-device-attestation_) . In the established user session, the user only has access to entitlement management.
+      schema:
+        type: boolean
+    confirmationCode:
+      name: confirmationCode
+      in: query
+      required: true
+      description: 6-digit confirmation code for device registration confirmation.
+      schema:
+        $ref: '#/components/schemas/ConfirmationCodeType'
   schemas:
     RequestDTO:
       description: Determines optionally the health record for the operation
@@ -1077,6 +1292,11 @@ components:
               example: name@example.com
             displayName:
               $ref: '#/components/schemas/DisplayNameType'
+    PutUserSpecificMedicationDenyListEntryRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/RequestDTO'
+        - $ref: '#/components/schemas/OidAndDisplayname'
+
     PutBlockedUserRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
@@ -1106,7 +1326,7 @@ components:
             - displayName
           properties:
             displayName:
-              $ref: '#/components/schemas/DisplayNameType'
+              $ref: '#/components/schemas/DeviceDisplayNameType'
     StoreDocumentRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
@@ -1118,6 +1338,31 @@ components:
                 $ref: '#/components/schemas/DocumentWithMetadata'
           required:
             - documentSets
+
+    RetrieveDocumentsRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/RequestDTO'
+        - type: object
+          description: array of document uniqueIDs to download
+          properties:
+            array:
+             items:
+              type: string
+          required:
+            - object
+
+    DeleteDocumentRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/RequestDTO'
+        - type: object
+          description: array of entryUUIDs of documents and/or folders to delete
+          properties:
+            array:
+              items:
+                type: string
+          required:
+            - object
+
     FindObjectsRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
@@ -1152,8 +1397,8 @@ components:
         - $ref: '#/components/schemas/RequestDTO'
         - type: object
           properties:
-            object:
-              $ref: '#/components/schemas/ObjectSelectorItem'
+            entryUUIDOfDocumentToUpdate:
+              type: string
             documentMetadata:
               $ref: '#/components/schemas/DocumentMetadata'
           required:
@@ -1164,8 +1409,8 @@ components:
         - $ref: '#/components/schemas/RequestDTO'
         - type: object
           properties:
-            object:
-              $ref: '#/components/schemas/ObjectSelectorItem'
+            entryUUIDOfDocumentToReplace:
+              type: string
             documentWithMetadata:
               $ref: '#/components/schemas/DocumentWithMetadata'
           required:
@@ -1173,11 +1418,11 @@ components:
             - documentWithMetadata
 
     PutEmailRequestDTO:
-       $ref: '#/components/schemas/EmailAddressType'
+      $ref: '#/components/schemas/EmailAddressType'
     PutEmailResponseDTO:
-       $ref: '#/components/schemas/ResponseDTO'
+      $ref: '#/components/schemas/ResponseDTO'
     GetEmailResponseDTO:
-       allOf:
+      allOf:
         - $ref: '#/components/schemas/ResponseDTO'
         - $ref: '#/components/schemas/EmailResponseType'
 
@@ -1259,6 +1504,29 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Entitlement'
+
+    GetUserSpecificMedicationDenyListResponseDTO:
+      description: Returns a list of all user specific medication deny list entries
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          required:
+            - assignments
+          properties:
+            assignments:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Assignment'
+                  - type: object
+                    required:
+                      - at
+                    properties:
+                      at:
+                        description: Creation timestamp
+                        allOf:
+                          - $ref: '#/components/schemas/DateTimeType'
+
     GetBlockedUserListResponseDTO:
       description: Returns a list of all blocked users
       allOf:
@@ -1517,6 +1785,22 @@ components:
         - productVersion
         - productType
         - productTypeVersion
+    LegalPolicyResponseDTO:
+      type: object
+      properties:
+        Create:
+          type: boolean
+        Read:
+          type: boolean
+        Update:
+          type: boolean
+        Delete:
+          type: boolean
+      required:
+        - Create
+        - Read
+        - Update
+        - Delete
     AuthorInstitution:
       type: object
       description: 'Institution, which is related to the author'
@@ -2226,6 +2510,7 @@ components:
         - emergency
         - eab
         - dental
+        - childsrecord
         - child
         - pregnancy_childbirth
         - vaccination
@@ -2404,6 +2689,10 @@ components:
       format: uuid
       description: Unique identifier of a device registration
       example: 74f09dbc-9268-411f-81e7-f1e4f3fb1b4f
+    DeviceTokenType:
+      type: string
+      description: "Device tokens are strings with 64 hexadecimal symbols."
+      example: "fe6b98ac23a3df214612fd089494eb2946589012a94e91ba6ed57f9213ba520a"
     DeviceStatusType:
       description: current status of device registration
       type: string
@@ -2411,6 +2700,21 @@ components:
         - pending
         - verified
       example: verified
+    DeviceDisplayNameType:
+      description: A readable name
+      type: string
+      example: This is my preferred device for ePA
+    PendingDeviceType:
+      allOf:
+        - $ref: '#/components/schemas/BaseDeviceType'
+        - type: object
+          properties:
+            remainingConfirmationRetries:
+              description: Indication of acceptable consecutive failed confirmation attemps
+              type: integer
+              maximum: 4
+              minimum: 0
+              example: 4
     BaseDeviceType:
       type: object
       properties:
@@ -2627,3 +2931,7 @@ components:
           uniqueItems: true
           items:
             $ref: '#/components/schemas/ObjectSelectorItem'
+    ConfirmationCodeType:
+      type: string
+      pattern: '^\d{6}$'
+      example: '123456'
