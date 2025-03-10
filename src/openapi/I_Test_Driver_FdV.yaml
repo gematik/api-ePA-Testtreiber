@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.0.1
+  version: 4.0.2
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -31,6 +31,8 @@ tags:
     description: 'list, update or add configuration parameters'
   - name: Entitle Management
     description: 'list, update, add or remove entitlements, list or configure the blocked user policy'
+  - name: Entitle Management EU
+    description: 'set or get entitlement for ncpeh'
   - name: Consent Decision Management
     description: list or update entries the consent decision management
   - name: Deny List Medication
@@ -115,7 +117,7 @@ paths:
       tags:
         - XDS Document
       summary: Delete documents in health record
-      description: 'This operation executes the use case "Delete Documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      description: 'This operation executes the use case "Delete Documents or Folders" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
       operationId: deleteDocuments
       requestBody:
         content:
@@ -313,7 +315,7 @@ paths:
       summary: Download documents from health record
       description: 'This operation executes the use case "Download documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId. The documents to download are referenced by their id, found before by finddocuments.'
       deprecated: true
-      operationId: retrieveDocuments
+      operationId: retrieveDocuments_deprecated
       parameters:
         - $ref: '#/components/parameters/recordId'
         - $ref: '#/components/parameters/entryUUID'
@@ -374,7 +376,7 @@ paths:
       summary: Delete documents or folders in the health record
       description: 'This operation executes the use case "Delete documents" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId. The documents to delete are referenced by their id, found before by finddocuments.'
       deprecated: true
-      operationId: deleteObjects
+      operationId: deleteObjects_deprecated
       parameters:
         - $ref: '#/components/parameters/recordId'
       requestBody:
@@ -401,6 +403,10 @@ paths:
         - $ref: '#/components/parameters/vzdOrgType'
         - $ref: '#/components/parameters/vzdOrgName'
         - $ref: '#/components/parameters/vzdOrgAlias'
+        - $ref: '#/components/parameters/vzdOrgProfessionOid'
+        - $ref: '#/components/parameters/vzdOrgTelematikId'
+        - $ref: '#/components/parameters/vzdSpecialty'
+
       responses:
         '200':
           description: A list of resources
@@ -465,6 +471,55 @@ paths:
       responses:
         default:
           description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
+
+  /epa/testdriver/api/v1/ncpeh/entitlement:
+    put:
+      tags:
+        - Entitle Management EU
+      summary: 'Set entitlement for ncpeh'
+      operationId: putEntitlementNcpeh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutEntitlementNcpehRequestDTO'
+      responses:
+        default:
+          description: default response for postEntitlementNcpeh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutEntitlementNcpehResponseDTO'
+    get:
+      tags:
+        - Entitle Management EU
+      summary: 'Get entitlement for ncpeh'
+      operationId: getEntitlementNcpeh
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response for getEntitlementNcpeh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEntitlementNcpehResponseDTO'
+
+    delete:
+      tags:
+        - Entitle Management EU
+      summary: 'Delete entitlement for ncpeh'
+      operationId: deleteEntitlementNcpeh
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response for deleteEntitlementNcpeh
           content:
             application/json:
               schema:
@@ -1126,19 +1181,44 @@ components:
         enum:
           - hcpo
           - diga
+          - ncpeh
       required: true
     vzdOrgName:
       name: name
       in: query
-      description: Name used for the organization
+      description: 'Name used for the organization. For NCPeH: The country name in German in its Kurzform [LVZ] (e.g. "Frankreich")'
       schema:
         type: string
     vzdOrgAlias:
       name: alias
       in: query
-      description: 'Alternate name that the organization is known as, or was known as in the past'
+      description: 'Alternate name that the organization is known as, or was known as in the past. For NCPeH: The country code from DIN EN ISO 3166-1 [LVZ] (e.g. "FR")'
       schema:
         type: string
+    vzdOrgProfessionOid:
+      name: professionOID
+      in: query
+      description: 'ProfessionOID of the organization. For NCPeH: oid_ncpeh'
+      schema:
+        type: string
+        pattern: '([0-2])((\.0)|(\.[1-9][0-9]*))*$'
+        example: 1.2.276.0.76.4.50
+    vzdOrgTelematikId:
+      name: telematikID
+      in: query
+      description: 'TelematikID of the organization.'
+      schema:
+        type: string
+        pattern: '^[1-9][0-9]?-[\x21-\x7E]+$'
+        maxLength: 128
+        example: 2-883110000118994
+    vzdSpecialty:
+      name: specialty
+      in: query
+      description: 'HealthcareService.speciality - ncpeh: supported services for the country'
+      schema:
+        type: string
+        example: 60591-5
     auditSinceLastLogin:
       name: sinceLastLogin
       in: query
@@ -1548,6 +1628,43 @@ components:
                         description: Creation timestamp
                         allOf:
                           - $ref: '#/components/schemas/DateTimeType'
+    PutEntitlementNcpehRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/RequestDTO'
+        - type: object
+          properties:
+            countryName:
+              $ref: '#/components/schemas/DisplayNameNcpehType'
+
+    PutEntitlementNcpehResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          properties:
+            entitlement:
+              $ref: '#/components/schemas/EntitlementNcpeh'
+            accesscode:
+              $ref: '#/components/schemas/AccessCodeType'
+            tid:
+              $ref: '#/components/schemas/TelematikIdType'
+          required:
+            - entitlement
+            - accesscode
+            - tid
+
+    GetEntitlementNcpehResponseDTO:
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          properties:
+            entitlement:
+              $ref: '#/components/schemas/EntitlementNcpeh'
+            accesscode:
+              $ref: '#/components/schemas/AccessCodeType'
+          required:
+            - entitlement
+            - accesscode
+
     PostEntitlementResponseDTO:
       allOf:
         - $ref: '#/components/schemas/ResponseDTO'
@@ -2481,6 +2598,9 @@ components:
     FunctionIdType:
       type: string
       description: function id of consent related functions of a health record.
+      enum:
+        - erp-submission
+        - medication
     DecisionType:
       type: string
       enum:
@@ -2555,6 +2675,16 @@ components:
               $ref: '#/components/schemas/ActorIdType'
             displayName:
               $ref: '#/components/schemas/DisplayNameType'
+
+    EntitlementNcpeh:
+      description: EntitlementNcpeh object
+      type: object
+      properties:
+        countryName:
+          $ref: '#/components/schemas/DisplayNameNcpehType'
+        validTo:
+          $ref: '#/components/schemas/DateTimeType'
+
     Assignment:
       description: Properties of one blocked user
       type: object
@@ -2566,6 +2696,12 @@ components:
               $ref: '#/components/schemas/TelematikIdType'
           required:
             - telematikId
+
+    DisplayNameNcpehType:
+      description: A readable name
+      type: string
+      example: Frankreich (FR)
+
     OidAndDisplayname:
       description: Properties to block one user
       type: object
@@ -2935,3 +3071,7 @@ components:
       type: string
       pattern: '^\d{6}$'
       example: '123456'
+
+    AccessCodeType:
+        type: string
+        example: A2C4E6
