@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.0.2
+  version: 4.0.3
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -1425,11 +1425,12 @@ components:
         - type: object
           description: array of document uniqueIDs to download
           properties:
-            array:
-             items:
-              type: string
+            uniqueIds:
+              type: array
+              items:
+                type: string
           required:
-            - object
+            - uniqueIds
 
     DeleteDocumentRequestDTO:
       allOf:
@@ -1437,11 +1438,12 @@ components:
         - type: object
           description: array of entryUUIDs of documents and/or folders to delete
           properties:
-            array:
+            entryUuids:
+              type: array
               items:
                 type: string
           required:
-            - object
+            - entryUuids
 
     FindObjectsRequestDTO:
       allOf:
@@ -1482,7 +1484,7 @@ components:
             documentMetadata:
               $ref: '#/components/schemas/DocumentMetadata'
           required:
-            - object
+            - entryUUIDOfDocumentToUpdate
             - documentMetadata
     ReplaceDocumentRequestDTO:
       allOf:
@@ -1494,7 +1496,7 @@ components:
             documentWithMetadata:
               $ref: '#/components/schemas/DocumentWithMetadata'
           required:
-            - object
+            - entryUUIDOfDocumentToReplace
             - documentWithMetadata
 
     PutEmailRequestDTO:
