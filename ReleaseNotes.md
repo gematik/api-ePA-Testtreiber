@@ -1,20 +1,23 @@
 <img width="200" height="37" src="images/Gematik_Logo_Flag_With_Background.png" alt="Gematik Logo"/> <br/>
 
-# Release notes epa-fdv testdriver api for ePA 3.x and above
-## Release 3.0.2-2 api Version 3.0.6
-### Changes
-- fix for PostEntitlementRequestDTO
+# Release notes epa-fdv testdriver api
 
-## Release 3.0.2-2 api Version 3.0.5
-### Changes
-- fix for oneOf
-- C11885 single email instead of list
+## Release 3.0.5 api Version 4.1.0
+- adds I_Test_Device_Farm_Management.yaml (new API for device farm management)
+- no changes in I_Test_Driver_FdV.yaml
 
-## Release 3.0.2
-- Initial version
-- Applied from https://github.com/gematik/ePA-Basic/blob/ePA-3.0.2/src/openapi/I_Test_Driver_FdV.yaml (pre-realase version 3.0.2)
-### Changes
-- login with recordId
-- configuration added
-- PostEmailResponseDTO corrected
+## Release 3.0.5 api Version 4.0.3
+- fixes "required: - object" error (breaking error)
 
+## Release candidate 3.0.5 api Version 4.0.2
+- bugfix: ensures unique operationIds
+- contains merge published epa3.1 VZD updates
+- contains merge published epa3.1 endpoints for EU access
+
+## Release candidate 3.0.5 api Version 4.0.1
+- adds /epa/testdriver/api/v1/UserSpecificMedicationDenyList
+
+## Release candidate 3.0.5 api Version 4.0.0
+- new endpoint for retrieve document list 
+- new endpoint for delete document metadata (compare ANFPSE-2834)
+- operations to trigger document service with technical object selectors only
