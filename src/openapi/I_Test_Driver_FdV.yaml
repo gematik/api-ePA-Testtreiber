@@ -2615,9 +2615,9 @@ components:
       example: 'urn:uuid:4fa70820-2384-4001-80a9-7bbd5e085efb'
     RootDocumentIdType:
       description: |
-        A CXi style identifier with schema 'uniqueID^^^^urn:gematik:iti:xds:2023:rootDocumentUniqueId' with symbolic UUID as uniqueId
+        A CXi style identifier with schema 'uniqueID' with symbolic UUID as uniqueId
       type: string
-      example: '4fa70820-2384-4001-80a9-7bbd5e085efb^^^^urn:gematik:iti:xds:2023:rootDocumentUniqueId'
+      example: '4fa70820-2384-4001-80a9-7bbd5e085efb'
     AssignmentIdType:
       description: Server-assigned unique uuid of a particular deny policy assignment
       type: string
