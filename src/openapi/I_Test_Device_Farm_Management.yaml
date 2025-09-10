@@ -9,7 +9,7 @@ info:
     `/epa-fdv-test-farm/devices/{deviceId}/{functional-endpoint-path}`
     where `{functional-endpoint-path}` is the path of the functional API endpoint documented in I_Test_Driver_FdV.yaml you want to access.
     The `{deviceId}` can be obtained by calling the `/devices` endpoint.
-  version: 4.1.0
+  version: 1.1.1
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -47,7 +47,7 @@ paths:
       parameters:
         - in: query
           name: insurant_id
-          description: The insurantId the device is related to.
+          description: "The insurantId the device is related to."
           schema:
             $ref: "#/components/schemas/KvnrType"
         - in: query
@@ -59,11 +59,19 @@ paths:
             example: android
         - in: query
           name: device_status
-          description: "Status of the device"
+          description: Status of the device
           schema:
             type: string
             enum: [ claimed, free ]
             example: claimed
+        - in: query
+          name: environment
+          description: The TI environment the device is assigned to.
+          schema:
+            type: string
+            enum: [ RU-DEV, RU-REF, TU ]
+            example: TU
+
       responses:
         "200":
           description: List of devices matching the given parameters
@@ -83,12 +91,12 @@ paths:
     put:
       tags:
         - Device Management
-      description: "Claims a device for exclusive use."
+      description: Claims a device for exclusive use.
       operationId: claimDevice
 
       responses:
         '200':
-          description: "Device successfully claimed"
+          description: Device successfully claimed
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -105,7 +113,7 @@ paths:
       operationId: unclaimDevice
       responses:
         '200':
-          description: "Device successfully unclaimed"
+          description: Device successfully unclaimed
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -127,7 +135,7 @@ components:
         example: 42
   schemas:
     Device:
-      description: "Claim information about a device"
+      description: Claim information about a device
       required:
         - deviceId
         - deviceName
@@ -135,32 +143,39 @@ components:
         - claimerCn
         - insurantId
         - deviceOs
+        - environment
       readOnly: true
       type: object
       properties:
         deviceId:
           type: integer
           format: int64
-          description: "Identifier of the device"
+          description: Identifier of the device
           example: 4711
         deviceName:
           type: string
-          description: "Name of the device"
-          example: "awesome_device_01"
+          description: Name of the device
+          example: awesome_device_01
         deviceStatus:
           type: string
           enum: [ claimed, free ]
-          description: "Status of the device"
+          description: Status of the device
         claimerCn:
           type: string
-          description: "Common name of claimers client cert"
-          example: "gematik GmbH"
+          description: Common name of claimers client cert
+          example: gematik GmbH
         insurantId:
           $ref: "#/components/schemas/KvnrType"
         deviceOs:
           type: string
-          description: "OS of the device e.g. android, ios, windows."
+          description: OS of the device e.g. android, ios, windows.
           example: android
+        environment:
+          type: string
+          description: The TI environment the device is assigned to.
+          enum: [ RU-DEV, RU-REF, TU ]
+          example: TU
+
     KvnrType:
       description: Type for insurantId.
       type: string
