@@ -2,6 +2,9 @@
 
 # Release notes epa-fdv testdriver api
 
+## Release 3.0.5 api Version 4.1.0 (no changes) Farm Management Version 1.1.1 (modified)
+- adds property environment to device endpoint
+
 ## Release 3.0.5 api Version 4.1.0
 - adds I_Test_Device_Farm_Management.yaml (new API for device farm management)
 - no changes in I_Test_Driver_FdV.yaml
