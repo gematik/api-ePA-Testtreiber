@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.2.0
+  version: 4.2.1
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -55,6 +55,8 @@ tags:
     description: 'Legally binding regulations for access rights'
   - name: MHD Service
     description: 'Full-text and metadata-based search for document references. Retrieving documents.'
+  - name: ResearchDataPurposes
+    description: list or update the research purposes
 
 
 paths:
@@ -707,6 +709,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
 
+  /epa/testdriver/api/v1/researchdatapurposes:
+    get:
+      tags:
+        - ResearchDataPurposes
+      summary: Get a list of all research data purposes
+      description: 'This operation executes the use case "List all research data purposes" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: getResearchDataPurposes
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResearchDataPurposesResponseDTO'
+
+  /epa/testdriver/api/v1/researchdatapurposes/{purposeId}:
+    put:
+      tags:
+        - ResearchDataPurposes
+      summary: Update decision for a research data purpose
+      description: 'This operation executes the use case "Update decision for a research data purpose" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: putResearchDataPurpose
+      parameters:
+        - in: path
+          name: purposeId
+          schema:
+            $ref: '#/components/schemas/PurposeIdType'
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionType'
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseDTO'
   /epa/testdriver/api/v1/constraints:
     get:
       tags:
@@ -980,6 +1025,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetMedicationListAsPdfResponseDTO'
 
+  /epa/testdriver/api/v1/medication/render/eml/fhir:
+    get:
+      tags:
+        - Medication
+      summary: Get a medication list (eML) as FHIR search bundle of a personal health record.
+      description: 'This operation executes the use case "List all medications as FHIR" in an existing user session. By default, the health record of the user is addressed, otherwise the health record is identified by "recordId".'
+      operationId: getMedicationListAsFhir
+      parameters:
+        - $ref: '#/components/parameters/recordId'
+        - $ref: '#/components/parameters/_count'
+        - $ref: '#/components/parameters/_offset'
+        - name: date
+          in: query
+          description: Limit the search to this date. Can specify upper or lower limits
+            and periods by providing an upper and a lower limit.
+            By specifying maximum two dates (comma separated e.g. date=ge2024-01-01,le2024-07-01) the search is limited to the range between the two dates.
+            The syntax is in the FHIR search parameter format where a prefix can be used to specify the operator.
+          required: false
+          schema:
+            type: string
+          example:
+            - 'gt2021-01-01'
+            - 'lt2021-01-01'
+            - 'ge2021-01-01'
+            - 'le2021-01-01'
+            - 'eq2021-01-01'
+        - name: format
+          in: query
+          required: false
+          description: 'Specify in which format the search bundle shall be returned. If not specified, the default format should be application/fhir+json.'
+          schema:
+            type: string
+            enum:
+              - application/fhir+json
+              - application/fhir+xml
+      responses:
+        default:
+          description: eML as FHIR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEmlAsFhirResponseDTO'
   /epa/testdriver/api/v1/audit:
     get:
       tags:
@@ -1427,6 +1514,8 @@ components:
           properties:
             entitlementType:
               type: string
+          required:
+            - entitlementType
           discriminator:
             propertyName: entitlementType
             mapping:
@@ -1450,6 +1539,8 @@ components:
               $ref: '#/components/schemas/TelematikIdType'
             validTo:
               $ref: '#/components/schemas/DateTimeType'
+            oid:
+              $ref: '#/components/schemas/OidType'
     PostEntitlementRequestRepDTO:
       allOf:
         - $ref: "#/components/schemas/PostEntitlementRequestDTO"
@@ -1577,6 +1668,7 @@ components:
                 - GetSubmissionSetAndContents
                 - GetFoldersForDocument
                 - GetFolderAndContents
+                - FindDocumentsByComment
               description: 'optional; if no stored query is set, the FdV has to choose an appropriate one according to the given search parameters.'
             returnType:
               type: string
@@ -1650,6 +1742,44 @@ components:
           properties:
             configurationEntry:
               $ref: '#/components/schemas/ConfigurationEntry'
+
+    GetResearchDataPurposesResponseDTO:
+      description: Returns a list of all research data purposes
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          required:
+            - researchDataPurposes
+          properties:
+            researchDataPurposes:
+              type: array
+              items:
+                $ref: '#/components/schemas/ResearchDataPurposeEntry'
+
+    ResearchDataPurposeEntry:
+      description: 'State of consent(permit or deny) to a purpose referring §303e SGB V clause 2'
+      type: object
+      properties:
+        purposeId:
+           $ref: '#/components/schemas/PurposeIdType'
+        decision:
+           $ref: '#/components/schemas/DecisionType'
+
+    PurposeIdType:
+      description: 'The purposeId is the key value of the research data purpose'
+      type: string
+      enum:
+            - purpose1
+            - purpose2
+            - purpose3
+            - purpose4
+            - purpose5
+            - purpose6
+            - purpose7
+            - purpose8
+            - purpose9
+            - purpose10
+
     GetConfigurationResponseDTO:
       description: Returns a list of all configuration parameters of the FdV with the set values
       allOf:
@@ -1856,6 +1986,15 @@ components:
           properties:
             eml:
               description: The eML as XHTML as string.
+              type: string
+    GetEmlAsFhirResponseDTO:
+      description: Response including the eML as FHIR Search Bundle based on the given search criteria.
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          properties:
+            eml:
+              description: 'The eML as FHIR Search Bundle as JSON or as XML: for details of the structure see http://hl7.org/fhir/search-set-bundle.html'
               type: string
     GetAuditEventResponseDTO:
       description: Returns a list of all audit events using the FHIR representation as string array where the content is JSON
@@ -2530,6 +2669,9 @@ components:
         XDSFolderEntryUUID:
           type: string
           description: Folder UUID
+        XDSDocumentEntryComments:
+          type: string
+          description: 'Text, der im Attribut comments des DocumentEntry gespeichert ist.'
     RegistryObjectLists:
       type: object
       title: RegistryObjectLists
@@ -2722,6 +2864,7 @@ components:
       enum:
         - erp-submission
         - medication
+        - data-submission
     DecisionType:
       type: string
       enum:
