@@ -2,11 +2,20 @@
 
 # Release notes epa-fdv testdriver api
 
-## Release 3.1.3 api Version 4.2.0
+## Release 3.1.3 includes Test Driver API version 4.2.1 and Farm Management API version 4.1.0
+- added endpoint for research data purposes ('researchdatapurposes')
+- added data-submission to FunctionIdType
+- added new query type 'FindDocumentsByComment'
+- added new endpoint ('/epa/testdriver/api/v1/medication/render/eml/fhir') to trigger retrieval of eML as FHIR search bundle
+
+## Release 3.1.3 includes Test Driver API version 4.2.0 and Farm Management API version 4.1.0
 - corrects retrieveDocuments (repositoryUniqueId added)
 - removes deprecated endpoints
 - added endpoint to support fulltext and metadata based search of documents (MHD document references)
 - added endpoint to retrieve documents referenced inside a document reference (MHD document references)
+
+## Release 3.0.5 api Version 4.1.0 (no changes) Farm Management Version 1.1.1 (modified)
+- adds property environment to device endpoint
 
 ## Release 3.0.5 api Version 4.1.0
 - adds I_Test_Device_Farm_Management.yaml (new API for device farm management)
