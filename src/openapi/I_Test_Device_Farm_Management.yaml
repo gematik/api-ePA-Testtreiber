@@ -9,7 +9,7 @@ info:
     `/epa-fdv-test-farm/devices/{deviceId}/{functional-endpoint-path}`
     where `{functional-endpoint-path}` is the path of the functional API endpoint documented in I_Test_Driver_FdV.yaml you want to access.
     The `{deviceId}` can be obtained by calling the `/devices` endpoint.
-  version: 4.1.0
+  version: 4.1.1
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -45,11 +45,6 @@ paths:
         - Device Management
       operationId: getDevices
       parameters:
-        - in: query
-          name: insurant_id
-          description: "The insurantId the device is related to."
-          schema:
-            $ref: "#/components/schemas/KvnrType"
         - in: query
           name: device_os
           description: The OS of the devices to retrieve
@@ -141,7 +136,6 @@ components:
         - deviceName
         - deviceStatus
         - claimerCn
-        - insurantId
         - deviceOs
         - environment
       readOnly: true
@@ -164,8 +158,6 @@ components:
           type: string
           description: Common name of claimers client cert
           example: gematik GmbH
-        insurantId:
-          $ref: "#/components/schemas/KvnrType"
         deviceOs:
           type: string
           description: OS of the device e.g. android, ios, windows.

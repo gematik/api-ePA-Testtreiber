@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.2.1
+  version: 4.2.3
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -46,14 +46,14 @@ tags:
   - name: Audit Event
     description: list audit events
   - name: XDS Document
-    description: 'list, retrieve, add or remove documents, folders, update metadata'
+    description: 'list, retrieve, add or remove documents, folders and update metadata'
   - name: Directory
     description: search for LEI or DIGA at FHIR-VZD
   - name: Email Address Management
     description: 'set or update email address of an insurant'
   - name: Legal Policy
     description: 'Legally binding regulations for access rights'
-  - name: MHD Service
+  - name: under construction - MHD Service
     description: 'Full-text and metadata-based search for document references. Retrieving documents.'
   - name: ResearchDataPurposes
     description: list or update the research purposes
@@ -1153,10 +1153,10 @@ paths:
                 $ref: '#/components/schemas/ProductInformationResponseDTO'
 
   /epa/testdriver/api/v1/mhd/document-reference:
-    get:
+     get:
         tags:
-            - MHD Service
-        summary: Search for DocumentReference resources.
+            - under construction - MHD Service
+        summary: end point must first be implemented with ePA 3.1.3 Phase 2 - Search for DocumentReference resources.
         description: 'This endpoint offers the ability to search for document references based on full-text or metadata.'
         operationId: searchDocumentReferences
         parameters:
@@ -1215,16 +1215,17 @@ paths:
             description: 'The title of the document based on DocumentEntry.title.'
         responses:
           default:
-            description: 'A list of document reference resources inside a searchset Bundle.'
+            description: 'A list of document reference resources'
             content:
                 application/json:
                   schema:
-                      $ref: '#/components/schemas/GetDocumentReferenceResponseDTO'
+                       $ref: '#/components/schemas/GetDocumentReferenceResponseDTO'
+
   /epa/testdriver/api/v1/mhd/document/{id}.{extension}:
     get:
         tags:
-            - MHD Service
-        summary: Retrieve a document by its ID and extension which is referenced in DocumentReference.
+            - under construction - MHD Service
+        summary: end point must first be implemented with ePA 3.1.3 Phase 2 - Retrieve a document by its ID and extension which is referenced in DocumentReference.
         description: 'This endpoint retrieves a document based on its ID and the requested file extension.'
         operationId: getDocumentByIdAndExtension
         parameters:
@@ -1612,7 +1613,7 @@ components:
 
     RetrieveDocumentsRequestType:
       type: object
-      description: 'List of entryUUIDs and repositoryUniqueIds of the documents to retrieve.'
+      description: 'List of documentUniqueIds and repositoryUniqueIds of the documents to retrieve.'
       properties:
         documentIdents:
           type: array
@@ -1622,16 +1623,17 @@ components:
 
     DocumentIdents:
       type: object
-      description: 'Contains the entryUUID and repositoryUniqueId of a document.'
+      description: 'Contains document uniqueId and repositoryUniqueId of a document.'
       properties:
-          entryUUID:
+          uniqueId:
             type: string
-            description: 'The entryUUID of the document.'
+            description: 'The document uniqueId of the document.'
           repositoryUniqueId:
             type: string
             description: 'The repositoryUniqueId of the document.'
-
-
+      required:
+        - uniqueId
+        - repositoryUniqueId
 
     DeleteDocumentRequestDTO:
       allOf:
@@ -1639,12 +1641,12 @@ components:
         - type: object
           description: array of entryUUIDs of documents and/or folders to delete
           properties:
-            entryUuids:
+            entryUUIDs:
               type: array
               items:
                 type: string
           required:
-            - entryUuids
+            - entryUUIDs
 
     FindObjectsRequestDTO:
       allOf:
@@ -2175,9 +2177,7 @@ components:
         - type: object
           properties:
             documentReferences:
-              allOf:
-                - $ref: '#/components/schemas/SearchSet_Bundle'
-              description: 'The result will be returned in a searchset Bundle. The bundle entries will be document references. For details of the document reference: https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-mhd-document-reference'
+              description: 'tbd. The result will be returned in a searchset Bundle. The bundle entries will be document references. For details of the document reference: https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-mhd-document-reference'
     AuthorInstitution:
       type: object
       description: 'Institution, which is related to the author'
@@ -2329,6 +2329,9 @@ components:
         entryUUID:
           type: string
           description: EntryUUID of a document
+        repositoryUniqueId:
+          type: string
+          description: repositoryUniqueId
         eventCodeList:
           type: array
           description: 'Events, which lead to creation of the document, Code out of Value Set for DocumentEntry.eventCodeList or table in A_17540-XX'
