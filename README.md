@@ -1,5 +1,6 @@
+<img align="right" width="250" height="47" src="Gematik_Logo_Flag_With_Background.png"/> <br/>
+
 # ePA-FdV Test Driver
-<img src="images/gematik_logo.jpg" alt="gematik_logo" width="200" height="37"/>
 
 This repository contains the OpenAPI specification for the ePA-FdV Test driver API. The API is used to test the ePA-FdV implementation in context of automated tests for gematik approval process.
 
