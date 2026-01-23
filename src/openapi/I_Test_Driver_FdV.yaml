@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.2.3
+  version: 4.2.4
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -850,16 +850,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  deviceIdentifier:
-                    $ref: '#/components/schemas/DeviceIdentifierType'
-                  deviceToken:
-                    $ref: '#/components/schemas/DeviceTokenType'
-                  data:
-                    $ref: '#/components/schemas/PendingDeviceType'
-                  emailNotification:
-                    $ref: '#/components/schemas/EmailAddressType'
+               $ref: '#/components/schemas/PostRegisterDeviceResponseDTO'
+
 
   /epa/testdriver/api/v1/devicemanagement/{deviceidentifier}:
     put:
@@ -1722,6 +1714,7 @@ components:
           type: string
       required:
         - success
+
     LoginResponseDTO:
       description: Returns the insurant id of the user that has logged in and the fqdn of access gateway
       allOf:
@@ -1730,11 +1723,31 @@ components:
           required:
             - insurantId
             - fqdn
+            - deviceRegistrationStatus
           properties:
             insurantId:
               $ref: '#/components/schemas/KvnrType'
             fqdn:
               type: string
+            deviceRegistrationStatus:
+              description: after successful user authorisation, the status informs whether a device registration is still required or not
+              type: string
+              enum:
+                - REQUIRED
+                - NOT_REQUIRED
+
+    PostRegisterDeviceResponseDTO:
+      description: returns the device identifier of the registered device
+      allOf:
+        - $ref: '#/components/schemas/ResponseDTO'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+                $ref: '#/components/schemas/PendingDeviceType'
+            emailNotification:
+              $ref: '#/components/schemas/EmailAddressType'
 
     GetConfigurationEntryResponseDTO:
       description: Returns the value of a configuration parameter of the FdV
@@ -3121,6 +3134,8 @@ components:
     BaseDeviceType:
       type: object
       properties:
+        deviceToken:
+          $ref: '#/components/schemas/DeviceTokenType'
         deviceIdentifier:
           $ref: '#/components/schemas/DeviceIdentifierType'
         status:
