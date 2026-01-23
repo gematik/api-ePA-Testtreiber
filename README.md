@@ -1,4 +1,4 @@
-<img align="right" width="250" height="47" src="Gematik_Logo_Flag_With_Background.png"/> <br/>
+<img align="right" width="250" height="47" src="images/Gematik_Logo_Flag_With_Background.png"/> <br/>
 
 # ePA-FdV Test Driver
 
@@ -7,6 +7,8 @@ This repository contains the OpenAPI specification for the ePA-FdV Test driver A
 Binding to a document release takes place via tags. A tagged version is a normative part of the specification of the referenced document release.
 
 This repository is also used for the collaborative further development of the ePA-FdV Test driver interface by ePA-FdV manufacturers and gematik. Hints, issues and pull requests are welcome.
+
+The API specifications that apply to a given document release are maintained in the corresponding branch (e.g. `ePA3.0.5`). During development, interim versions are tagged as `<version>-rc<n>` (e.g. `3.0.5-rc3`), where `rc` stands for “release candidate”. The version that is binding for approval (Zulassung) is marked with the final document release version (e.g. `3.0.5`).
 
 ## License
 
@@ -24,4 +26,4 @@ See the [LICENSE](./LICENSE) for the specific language governing permissions and
     2. The software is provided "as is" without warranty of any kind, either express or implied, including, but not limited to, the warranties of fitness for a particular purpose, merchantability, and/or non-infringement. The authors or copyright holders shall not be liable in any manner whatsoever for any damages or other claims arising from, out of or in connection with the software or the use or other dealings with the software, whether in an action of contract, tort, or otherwise.
     3. The software is the result of research and development activities, therefore not necessarily quality assured and without the character of a liable product. For this reason, gematik does not provide any support or other user assistance (unless otherwise stated in individual cases and without justification of a legal obligation). Furthermore, there is no claim to further development and adaptation of the results to a more current state of the art.
 3. Gematik may remove published results temporarily or permanently from the place of publication at any time without prior notice or justification.
-4. Please note: Parts of this code may have been generated using AI-supported technology. Please take this into account, especially when troubleshooting, for security analyses and possible adjustments.
+4. Parts of this software and - in isolated cases - content such as text or images may have been developed using the support of AI tools. They are subject to the same reviews, tests, and security checks as any other contribution. The functionality of the software itself is not based on AI decisions.

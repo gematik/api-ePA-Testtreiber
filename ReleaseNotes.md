@@ -1,10 +1,15 @@
 <img width="200" height="37" src="images/Gematik_Logo_Flag_With_Background.png" alt="Gematik Logo"/> <br/>
 
 # Release notes epa-fdv testdriver api
+## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.4 and Farm Management API version 4.1.1
+- Test Driver API version 4.2.4
+  - added deviceRegistrationStatus to LoginResponseDTO
+  - corrected PostRegisterDeviceResponseDTO (missing required generell ResponseDTO)
+
 ## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.3 and Farm Management API version 4.1.1
 - Test Driver API version 4.2.3
   - marks endpoints '/epa/testdriver/api/v1/mhd*' as to be implemented first with 3.1.3 Phase 2
-  - adds repositoryUniqueId to the DocumentMetadata
+  - added repositoryUniqueId to the DocumentMetadata
 - Farm Management API version 4.1.1
   - removes Kvnr from Device structure
 
