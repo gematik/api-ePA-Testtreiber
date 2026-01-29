@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.2.4
+  version: 4.2.5
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -979,7 +979,7 @@ paths:
         default:
           description: A list of resources
           content:
-            application/fhir+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/GetMedicationResponseDTO'
 
