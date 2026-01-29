@@ -1,6 +1,10 @@
 <img width="200" height="37" src="images/Gematik_Logo_Flag_With_Background.png" alt="Gematik Logo"/> <br/>
 
 # Release notes epa-fdv testdriver api
+## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.5 and Farm Management API version 4.1.1
+- Test Driver API version 4.2.5
+  - fixed wrong content type
+
 ## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.4 and Farm Management API version 4.1.1
 - Test Driver API version 4.2.4
   - added deviceRegistrationStatus to LoginResponseDTO
