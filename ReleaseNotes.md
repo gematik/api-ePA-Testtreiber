@@ -1,19 +1,26 @@
 <img width="200" height="37" src="images/Gematik_Logo_Flag_With_Background.png" alt="Gematik Logo"/> <br/>
 
 # Release notes epa-fdv testdriver api
+## Release 3.1.3 Phase 2 includes Test Driver API version 4.2.6 and Farm Management API version 4.1.2
+- Test Driver API version 4.2.6
+  - revises endpoints '/epa/testdriver/api/v1/mhd*' 
+  - adapts putEmailAddress operation to ensure consistent handling of requests
+ - Farm Management API version 4.1.2
+  - adds optional device property 'driverStatus'
+
 ## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.5 and Farm Management API version 4.1.1
 - Test Driver API version 4.2.5
   - fixed wrong content type
 
 ## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.4 and Farm Management API version 4.1.1
 - Test Driver API version 4.2.4
-  - added deviceRegistrationStatus to LoginResponseDTO
-  - corrected PostRegisterDeviceResponseDTO (missing required generell ResponseDTO)
+  - adds deviceRegistrationStatus to LoginResponseDTO
+  - corrects PostRegisterDeviceResponseDTO (missing required generell ResponseDTO)
 
 ## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.3 and Farm Management API version 4.1.1
 - Test Driver API version 4.2.3
   - marks endpoints '/epa/testdriver/api/v1/mhd*' as to be implemented first with 3.1.3 Phase 2
-  - added repositoryUniqueId to the DocumentMetadata
+  - adds repositoryUniqueId to the DocumentMetadata
 - Farm Management API version 4.1.1
   - removes Kvnr from Device structure
 
@@ -21,10 +28,10 @@
 - corrects DocumentIdents structure (retrieveDocuments)
 
 ## Release 3.1.3 includes Test Driver API version 4.2.1 and Farm Management API version 4.1.0
-- added endpoint for research data purposes ('researchdatapurposes')
-- added data-submission to FunctionIdType
-- added new query type 'FindDocumentsByComment'
-- added new endpoint ('/epa/testdriver/api/v1/medication/render/eml/fhir') to trigger retrieval of eML as FHIR search bundle
+- adds endpoint for research data purposes ('researchdatapurposes')
+- adds data-submission to FunctionIdType
+- adds new query type 'FindDocumentsByComment'
+- adds new endpoint ('/epa/testdriver/api/v1/medication/render/eml/fhir') to trigger retrieval of eML as FHIR search bundle
 
 ## Release 3.1.3 includes Test Driver API version 4.2.0 and Farm Management API version 4.1.0
 - corrects retrieveDocuments (repositoryUniqueId added)
