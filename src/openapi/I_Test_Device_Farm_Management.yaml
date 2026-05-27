@@ -9,7 +9,7 @@ info:
     `/epa-fdv-test-farm/devices/{deviceId}/{functional-endpoint-path}`
     where `{functional-endpoint-path}` is the path of the functional API endpoint documented in I_Test_Driver_FdV.yaml you want to access.
     The `{deviceId}` can be obtained by calling the `/devices` endpoint.
-  version: 4.1.1
+  version: 4.1.2
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -130,7 +130,7 @@ components:
         example: 42
   schemas:
     Device:
-      description: Claim information about a device
+      description: Information about a device
       required:
         - deviceId
         - deviceName
@@ -167,6 +167,11 @@ components:
           description: The TI environment the device is assigned to.
           enum: [ RU-DEV, RU-REF, TU ]
           example: TU
+        driverStatus:
+          type: string
+          enum: [ started, stopped, configuring_start, failed_start, configuring_stop, failed_stop, reconfiguring_default, failed_reconfiguring_default ]
+          description: Status of the driver running on the device
+          example: started
 
     KvnrType:
       description: Type for insurantId.
