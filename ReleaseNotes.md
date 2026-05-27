@@ -6,7 +6,7 @@
   - revises endpoints '/epa/testdriver/api/v1/mhd*' 
   - adapts putEmailAddress operation to ensure consistent handling of requests
  - Farm Management API version 4.1.2
-  - adds optional device property 'driverStatus'
+   - adds optional device property 'driverStatus'
 
 ## Release 3.1.3 Phase 1 includes Test Driver API version 4.2.5 and Farm Management API version 4.1.1
 - Test Driver API version 4.2.5
