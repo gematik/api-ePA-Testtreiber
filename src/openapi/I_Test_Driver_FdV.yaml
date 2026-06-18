@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.2.6
+  version: 4.2.7
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -682,6 +682,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseDTO'
+
   /epa/testdriver/api/v1/researchdatapurposes:
     get:
       tags:
@@ -717,7 +718,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DecisionType'
+              $ref: '#/components/schemas/PutResearchDataPurposeRequestDTO'
+
       responses:
         default:
           description: default response
@@ -1541,6 +1543,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
         - $ref: '#/components/schemas/OidAndDisplayname'
+
     PutConsentDecisionRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
@@ -1550,6 +1553,17 @@ components:
           properties:
             decision:
               $ref: '#/components/schemas/DecisionType'
+
+    PutResearchDataPurposeRequestDTO:
+      allOf:
+        - $ref: '#/components/schemas/RequestDTO'
+        - type: object
+          required:
+            - decision
+          properties:
+            decision:
+              $ref: '#/components/schemas/DecisionType'
+
     PostConstraintRequestDTO:
       allOf:
         - $ref: '#/components/schemas/RequestDTO'
