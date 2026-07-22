@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: I_Test_Driver_FdV
   description: REST Test Interface for the Insurant´s User Frontend (FdV)
-  version: 4.2.7
+  version: 4.2.8
   contact:
     name: gematik GmbH
     email: software-development@gematik.de
@@ -1127,6 +1127,13 @@ paths:
           schema:
             type: string
           description: The data for the full-text search in documents referenced by DocumentReference
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The status of the document based on DocumentReference.status.
+          example: 'current'
         - name: format
           in: query
           required: false
@@ -1139,7 +1146,6 @@ paths:
           schema:
             type: string
           description: The type of the document based on DocumentEntry.typeCode.
-          example: 'http://www.ihe-d.de/fhir/CodeSystem/Dokumententypen|BERI'
         - name: category
           in: query
           required: false
@@ -1158,6 +1164,7 @@ paths:
           schema:
             type: string
           description: The title of the document based on DocumentEntry.title.
+          example: 'Befundbericht'
         - name: creation
           in: query
           required: false
@@ -2181,7 +2188,8 @@ components:
               items:
                 type: string
               description: 'The item of the documentReferences array will be a document reference object as JSON.  The structure of the document reference itself is specified under following URL: https://gemspec.gematik.de/ig/fhir/epa-mhd/1.1.1/StructureDefinition-epa-mhd-document-reference.html'
-      example: '{ "success": true, "statusMessage": "string", "documentReferences": [{ "fullUrl" : "http://epa4all/epa/mhd/api/v1/fhir/DocumentReference/b2d5f8db-48ca-43c4-a540-6c8f2e853913", "resource" : { "resourceType" : "DocumentReference", "id" : "b2d5f8db-48ca-43c4-a540-6c8f2e853913", "meta" : { "profile" : [ "https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-mhd-document-reference" ] }, "masterIdentifier" : { "system" : "urn:ietf:rfc:3986", "value" : "urn:oid:2.25.104666037230925920288492414767863731214" }, "identifier" : [ { "use" : "official", "system" : "urn:ietf:rfc:3986", "value" : "urn:uuid:b2d5f8db-48ca-43c4-a540-6c8f2e853913" } ], "status" : "current", "type" : { "coding" : [ { "system" : "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.9", "code" : "ADCH", "display" : "Administrative Checklisten" } ] }, "category" : [ { "coding" : [ { "system" : "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.8", "code" : "BEF", "display" : "Befundbericht" } ] } ], "subject" : { "type" : "Patient", "identifier" : { "type" : { "coding" : [ { "system" : "http://fhir.de/CodeSystem/identifier-type-de-basis", "code" : "KVZ10", "display" : "Krankenversichertennummer" } ] }, "system" : "http://fhir.de/sid/gkv/kvid-10", "value" : "G995030566" }, "display" : "Gundlach, Monika" }, "author" : [ { "type" : "Organization", "identifier" : { "system" : "https://gematik.de/fhir/sid/telematik-id", "value" : "1-2c47sd-e518" }, "display" : "Arztpraxis Dr. Thilo Weber" } ], "description" : "Beispieldokument", "securityLabel" : [ { "coding" : [ { "system" : "urn:oid:2.16.840.1.113883.5.25", "code" : "N", "display" : "normal" } ] }, { "coding" : [ { "system" : "urn:oid:1.2.276.0.76.5.511", "code" : "reports", "display" : "Befunde/Diagnosen/Berichte" } ] } ], "content" : [ { "attachment" : { "contentType" : "application/pdf", "language" : "de-DE", "url" : "http://epa4all/epa/mhd/retrieve/v1/content/b2d5f8db-48ca-43c4-a540-6c8f2e853913.pdf", "size" : 3654, "hash" : "yPnibUHWIkRejf1euZCDWQ==", "title" : "Neurologischer_Untersuchungsbefund.pdf", "creation" : "2025-12-01T09:03:24Z" }, "format" : { "system" : "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.6", "code" : "urn:ihe-d:spec:PDF_A1:2005", "display" : "PDF/A-1" } } ], "context" : { "event" : [ { "coding" : [ { "system" : "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.16", "code" : "E200", "display" : "stationärer Aufenthalt" } ] } ], "period" : { "start" : "2025-11-28" }, "facilityType" : { "coding" : [ { "system" : "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.2", "code" : "KHS", "display" : "Krankenhaus" } ] }, "practiceSetting" : { "coding" : [ { "system" : "urn:oid:1.3.6.1.4.1.19376.3.276.1.5.4", "code" : "NEUR", "display" : "Neurologie" } ] }, "related" : [ { "identifier" : { "system" : "urn:gematik:iti:xds:2023:rootDocumentUniqueId" } }, { "identifier" : { "value" : "http://epa4all/epa/mhd/retrieve/v1/content/2.25.31457958586625016607071363908764203414.pdf" } } ] } }, "search" : { "extension" : [ { "extension" : [ { "url" : "snippet", "valueString" : "Das ist ein <match>Test</match>." }, { "url" : "pageNumber", "valueString" : "1" } ], "url" : "https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-match-snippet" }, { "extension" : [ { "url" : "snippet", "valueString" : "Das ist ein anderer <match>Test</match>." }, { "url" : "pageNumber", "valueString" : "23" } ], "url" : "https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-match-snippet" }, { "url" : "https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-match-total-hits", "valueInteger" : 2 } ], "mode" : "match", "score" : 0.9 } }] }'
+      example: '{"success":true,"statusMessage":"string","documentReferences":["{\"fullUrl\":\"http://epa4all/epa/mhd/api/v1/fhir/DocumentReference/b2d5f8db-48ca-43c4-a540-6c8f2e853913\",\"resource\":{\"resourceType\":\"DocumentReference\",\"id\":\"b2d5f8db-48ca-43c4-a540-6c8f2e853913\",\"meta\":{\"profile\":[\"https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-mhd-document-reference\"]},\"masterIdentifier\":{\"system\":\"urn:ietf:rfc:3986\",\"value\":\"urn:oid:2.25.104666037230925920288492414767863731214\"},\"identifier\":[{\"use\":\"official\",\"system\":\"urn:ietf:rfc:3986\",\"value\":\"urn:uuid:b2d5f8db-48ca-43c4-a540-6c8f2e853913\"}],\"status\":\"current\",\"type\":{\"coding\":[{\"system\":\"urn:oid:1.3.6.1.4.1.19376.3.276.1.5.9\",\"code\":\"ADCH\",\"display\":\"AdministrativeChecklisten\"}]},\"category\":[{\"coding\":[{\"system\":\"urn:oid:1.3.6.1.4.1.19376.3.276.1.5.8\",\"code\":\"BEF\",\"display\":\"Befundbericht\"}]}],\"subject\":{\"type\":\"Patient\",\"identifier\":{\"type\":{\"coding\":[{\"system\":\"http://fhir.de/CodeSystem/identifier-type-de-basis\",\"code\":\"KVZ10\",\"display\":\"Krankenversichertennummer\"}]},\"system\":\"http://fhir.de/sid/gkv/kvid-10\",\"value\":\"G995030566\"},\"display\":\"Gundlach,Monika\"},\"author\":[{\"type\":\"Organization\",\"identifier\":{\"system\":\"https://gematik.de/fhir/sid/telematik-id\",\"value\":\"1-2c47sd-e518\"},\"display\":\"ArztpraxisDr.ThiloWeber\"}],\"description\":\"Beispieldokument\",\"securityLabel\":[{\"coding\":[{\"system\":\"urn:oid:2.16.840.1.113883.5.25\",\"code\":\"N\",\"display\":\"normal\"}]},{\"coding\":[{\"system\":\"urn:oid:1.2.276.0.76.5.511\",\"code\":\"reports\",\"display\":\"Befunde/Diagnosen/Berichte\"}]}],\"content\":[{\"attachment\":{\"contentType\":\"application/pdf\",\"language\":\"de-DE\",\"url\":\"http://epa4all/epa/mhd/retrieve/v1/content/b2d5f8db-48ca-43c4-a540-6c8f2e853913.pdf\",\"size\":3654,\"hash\":\"yPnibUHWIkRejf1euZCDWQ==\",\"title\":\"Neurologischer_Untersuchungsbefund.pdf\",\"creation\":\"2025-12-01T09:03:24Z\"},\"format\":{\"system\":\"urn:oid:1.3.6.1.4.1.19376.3.276.1.5.6\",\"code\":\"urn:ihe-d:spec:PDF_A1:2005\",\"display\":\"PDF/A-1\"}}],\"context\":{\"event\":[{\"coding\":[{\"system\":\"urn:oid:1.3.6.1.4.1.19376.3.276.1.5.16\",\"code\":\"E200\",\"display\":\"stationärerAufenthalt\"}]}],\"period\":{\"start\":\"2025-11-28\"},\"facilityType\":{\"coding\":[{\"system\":\"urn:oid:1.3.6.1.4.1.19376.3.276.1.5.2\",\"code\":\"KHS\",\"display\":\"Krankenhaus\"}]},\"practiceSetting\":{\"coding\":[{\"system\":\"urn:oid:1.3.6.1.4.1.19376.3.276.1.5.4\",\"code\":\"NEUR\",\"display\":\"Neurologie\"}]},\"related\":[{\"identifier\":{\"system\":\"urn:gematik:iti:xds:2023:rootDocumentUniqueId\"}},{\"identifier\":{\"value\":\"http://epa4all/epa/mhd/retrieve/v1/content/2.25.31457958586625016607071363908764203414.pdf\"}}]}},\"search\":{\"extension\":[{\"extension\":[{\"url\":\"snippet\",\"valueString\":\"Dasistein<match>Test</match>.\"},{\"url\":\"pageNumber\",\"valueString\":\"1\"}],\"url\":\"https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-match-snippet\"},{\"extension\":[{\"url\":\"snippet\",\"valueString\":\"Dasisteinanderer<match>Test</match>.\"},{\"url\":\"pageNumber\",\"valueString\":\"23\"}],\"url\":\"https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-match-snippet\"},{\"url\":\"https://gematik.de/fhir/epa-mhd/StructureDefinition/epa-match-total-hits\",\"valueInteger\":2}],\"mode\":\"match\",\"score\":0.9}}"]}'
+
     AuthorInstitution:
       type: object
       description: 'Institution, which is related to the author'

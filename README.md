@@ -4,6 +4,8 @@
 
 This repository contains the OpenAPI specification for the ePA-FdV Test driver API. The API is used to test the ePA-FdV implementation in context of automated tests for gematik approval process.
 
+The test driver module transfers information from the external interface defined in this repo to a manufacturer-specific internal interface to trigger certain requirements for the ePA FdV. It acts as a gateway and doesn't implement its own logic, like retrieving additional information. It is allowed to process the responses from the ePA FdV according to the technical interface, but it must not change the technical content.
+
 Binding to a document release takes place via tags. A tagged version is a normative part of the specification of the referenced document release.
 
 This repository is also used for the collaborative further development of the ePA-FdV Test driver interface by ePA-FdV manufacturers and gematik. Hints, issues and pull requests are welcome.
