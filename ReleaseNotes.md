@@ -1,6 +1,11 @@
 <img width="200" height="37" src="images/Gematik_Logo_Flag_With_Background.png" alt="Gematik Logo"/> <br/>
 
 # Release notes epa-fdv testdriver api
+## Release 3.1.3 Phase 2 includes Test Driver API version 4.2.8 and Farm Management API version 4.1.2
+- Test Driver API version 4.2.8
+  - corrects example for GetDocumentReferenceResponseDTO
+  - adds required search parameter 'status' for operation searchDocumentReferences
+
 ## Release 3.1.3 Phase 2 includes Test Driver API version 4.2.7 and Farm Management API version 4.1.2
 - Test Driver API version 4.2.7
   - adds recordId to operation putResearchDataPurpose (compare ANFEPA-4489) 
